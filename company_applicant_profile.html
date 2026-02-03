@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Applicant Profile - Company</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Company</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">S</div>
+      <div><b>Samsung</b><small>Company Account</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="company_jobposts.html">Job Posts</a>
+      <a href="company_interview.html">Interview</a>
+      <a class="active" href="company_applicants.html">Applicants</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2>View Applicant Profile</h2>
+        <p>Prototype preview: About + Skills + CV button.</p>
+      </div>
+      <a class="btn btn-ghost" href="company_applicants.html">Back</a>
+    </div>
+
+    <div class="section" style="text-align:center;">
+      <div class="avatar" style="margin:0 auto 10px; width:64px;height:64px;">E</div>
+      <b style="display:block;">Eric #12H4E</b>
+      <small>Computer Science • AU</small>
+
+      <div class="grid" style="margin-top:16px;">
+        <div class="card" style="grid-column: span 12;">
+          <h3>About</h3>
+          <p style="margin-top:8px;">Interested in backend development and databases. Experienced with Python and SQL projects.</p>
+        </div>
+        <div class="card" style="grid-column: span 12;">
+          <h3>Experiences and Skills</h3>
+          <p style="margin-top:8px;">Python • SQL • Git • Teamwork • Communication</p>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <a class="btn btn-primary" href="company_application.html">View Application</a>
+        <a class="btn" href="#" onclick="alert('Prototype: Open CV'); return false;">View CV</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

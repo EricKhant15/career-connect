@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Companies</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Admin</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">A</div>
+      <div><b>Admin1</b><small>System Admin</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="admin_dashboard.html">Dashboard</a>
+      <a class="active" href="admin_companies.html">Companies</a>
+      <a href="admin_internships.html">Internships</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search" style="min-width:360px;">
+        <input id="q" placeholder="Search company name, industry, email..." />
+      </div>
+      <span class="chip">Approve / Reject company accounts</span>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0;">Manage Companies</h2>
+      <p style="color:var(--muted); margin-top:6px;">
+        Review company verification status before they can post internships.
+      </p>
+
+      <table class="table" style="margin-top:12px;">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Industry</th>
+            <th>Contact</th>
+            <th>Status</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+  const companies = [
+    { name:"TechCo Solutions", industry:"Technology", email:"hr@techco.com", status:"Pending" },
+    { name:"BrightFuture Marketing", industry:"Marketing", email:"contact@bfm.co", status:"Approved" },
+    { name:"EduWorld International", industry:"Education", email:"admin@eduworld.org", status:"Approved" },
+    { name:"GreenCare Services", industry:"Environment", email:"info@greencare.sg", status:"Rejected" },
+    { name:"ProSoft Digital", industry:"Software", email:"support@prosoft.com", status:"Pending" }
+  ];
+
+  function statusClass(s){
+    if(s==="Approved") return "ok";
+    if(s==="Rejected") return "warn";
+    return "good"; // Pending
+  }
+
+  function render(){
+    const q = (document.getElementById("q").value || "").toLowerCase().trim();
+    const list = !q ? companies : companies.filter(c =>
+      (c.name + " " + c.industry + " " + c.email).toLowerCase().includes(q)
+    );
+
+    document.getElementById("rows").innerHTML = list.map((c, i) => `
+      <tr>
+        <td><b>${c.name}</b></td>
+        <td>${c.industry}</td>
+        <td>${c.email}</td>
+        <td><span class="status ${statusClass(c.status)}">${c.status}</span></td>
+        <td style="text-align:right;">
+          <button class="btn" onclick="view(${i})">View</button>
+          <button class="btn btn-primary" onclick="setStatus(${i}, 'Approved')">Approve</button>
+          <button class="btn btn-ghost" onclick="setStatus(${i}, 'Rejected')">Reject</button>
+        </td>
+      </tr>
+    `).join("") || `<tr><td colspan="5" style="color:var(--muted);">No results.</td></tr>`;
+  }
+
+  function setStatus(i, s){
+    const q = (document.getElementById("q").value || "").toLowerCase().trim();
+    const list = !q ? companies : companies.filter(c =>
+      (c.name + " " + c.industry + " " + c.email).toLowerCase().includes(q)
+    );
+    const target = list[i];
+    const idx = companies.findIndex(x => x.name === target.name);
+    companies[idx].status = s;
+    render();
+    alert("Prototype: " + target.name + " is now " + s);
+  }
+
+  function view(i){
+    alert("Prototype view:\nCompany details page not required for this submission.");
+  }
+
+  document.getElementById("q").addEventListener("input", render);
+  render();
+</script>
+
+</body>
+</html>

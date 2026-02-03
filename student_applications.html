@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Applications - CareerConnect</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Student</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">E</div>
+      <div><b>Eric #12H4E</b><small>Student Account</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="student_dashboard.html">Dashboard</a>
+      <a href="student_browse.html">Internships</a>
+      <a class="active" href="student_applications.html">Applications</a>
+      <a href="student_documents.html">Documents</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2>Applications</h2>
+        <p>Track your application status (pre-set data for demo).</p>
+      </div>
+      <a class="btn btn-primary" href="student_browse.html">Find More Internships</a>
+    </div>
+
+    <div class="section">
+      <div class="sectionHeader">
+        <b>Application List</b>
+        <span class="chip">7 records</span>
+      </div>
+
+      <table class="table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Internship</th>
+            <th>Applied Date</th>
+            <th>Action</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Software Engineer Intern (Google Thailand)</td>
+            <td>02/07/2025</td>
+            <td><a class="btn" href="student_apply.html">View</a></td>
+            <td><span class="status good">Submitted</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Marketing Intern (Shopee)</td>
+            <td>28/03/2025</td>
+            <td><a class="btn" href="student_apply.html">View</a></td>
+            <td><span class="status warn">Under Review</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Data Analyst Intern (SCG)</td>
+            <td>12/08/2025</td>
+            <td><a class="btn" href="student_apply.html">View</a></td>
+            <td><span class="status ok">Accepted</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

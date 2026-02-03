@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Manage Internships</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Admin</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">A</div>
+      <div><b>Admin1</b><small>System Admin</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="admin_dashboard.html">Dashboard</a>
+      <a href="admin_companies.html">Companies</a>
+      <a class="active" href="admin_internships.html">Internships</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="search" style="min-width:360px;">
+        <input id="q" placeholder="Search internship title or company..." />
+      </div>
+      <span class="chip">Enable / Disable internship postings</span>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0;">Manage Internships</h2>
+      <p style="color:var(--muted); margin-top:6px;">
+        Moderate internship postings for quality control (prototype).
+      </p>
+
+      <table class="table" style="margin-top:12px;">
+        <thead>
+          <tr>
+            <th>Post ID</th>
+            <th>Internship</th>
+            <th>Company</th>
+            <th>Work Mode</th>
+            <th>Deadline</th>
+            <th>Status</th>
+            <th style="text-align:right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+  const posts = [
+    { id:"JP-001", title:"Software Developer Intern", company:"TechCo Solutions", mode:"Onsite", deadline:"10/12/2025", status:"Active" },
+    { id:"JP-002", title:"Marketing Intern", company:"BrightFuture Marketing", mode:"Hybrid", deadline:"20/10/2025", status:"Active" },
+    { id:"JP-003", title:"UI/UX Intern", company:"ProSoft Digital", mode:"Remote", deadline:"30/09/2025", status:"Disabled" }
+  ];
+
+  function statusClass(s){
+    return (s==="Active") ? "ok" : "warn";
+  }
+
+  function render(){
+    const q = (document.getElementById("q").value || "").toLowerCase().trim();
+    const list = !q ? posts : posts.filter(p =>
+      (p.title + " " + p.company + " " + p.id).toLowerCase().includes(q)
+    );
+
+    document.getElementById("rows").innerHTML = list.map((p, i) => `
+      <tr>
+        <td>${p.id}</td>
+        <td><b>${p.title}</b></td>
+        <td>${p.company}</td>
+        <td>${p.mode}</td>
+        <td>${p.deadline}</td>
+        <td><span class="status ${statusClass(p.status)}">${p.status}</span></td>
+        <td style="text-align:right;">
+          <button class="btn" onclick="view(${i})">View</button>
+          ${p.status==="Active"
+            ? `<button class="btn btn-ghost" onclick="setStatus(${i}, 'Disabled')">Disable</button>`
+            : `<button class="btn btn-primary" onclick="setStatus(${i}, 'Active')">Enable</button>`
+          }
+        </td>
+      </tr>
+    `).join("") || `<tr><td colspan="7" style="color:var(--muted);">No results.</td></tr>`;
+  }
+
+  function setStatus(i, s){
+    const q = (document.getElementById("q").value || "").toLowerCase().trim();
+    const list = !q ? posts : posts.filter(p =>
+      (p.title + " " + p.company + " " + p.id).toLowerCase().includes(q)
+    );
+    const target = list[i];
+    const idx = posts.findIndex(x => x.id === target.id);
+    posts[idx].status = s;
+    render();
+    alert("Prototype: " + target.id + " is now " + s);
+  }
+
+  function view(i){
+    alert("Prototype view:\nThis could open a details page later, but not required now.");
+  }
+
+  document.getElementById("q").addEventListener("input", render);
+  render();
+</script>
+
+</body>
+</html>

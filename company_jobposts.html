@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Job Posts - Company</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Company</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">S</div>
+      <div><b>Samsung</b><small>Company Account</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="company_dashboard.html">Dashboard</a>
+      <a class="active" href="company_jobposts.html">Job Posts</a>
+      <a href="company_interview.html">Interview</a>
+      <a href="company_applicants.html">Applicants</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- Topbar -->
+    <div class="topbar">
+      <div class="search" style="min-width:360px;">
+        <input id="jobSearch" placeholder="Search job title, category, location..." />
+      </div>
+      <div class="actions">
+        <span class="chip" id="jobCountChip">0 jobs</span>
+        <a class="btn btn-primary" href="company_post.html">Create a new Job Posting</a>
+      </div>
+    </div>
+
+    <div class="sectionHeader" style="margin-bottom:10px;">
+      <b>My Job Postings</b>
+      <span class="chip">Prototype data</span>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Job list -->
+      <div class="card" style="grid-column: span 4;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <h3 style="margin:0;">Jobs</h3>
+          <span class="chip" id="openCount">Open: 0</span>
+        </div>
+
+        <div id="jobList" style="margin-top:12px; display:flex; flex-direction:column; gap:10px;"></div>
+      </div>
+
+      <!-- RIGHT: Job details -->
+      <div class="card" style="grid-column: span 8;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;">
+          <div>
+            <h2 style="margin:0;" id="jobTitle">Job</h2>
+            <p style="margin-top:6px; color:var(--muted);" id="jobSubtitle">—</p>
+            <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+              <span class="chip" id="metaPosted">Posted: —</span>
+              <span class="chip" id="metaDeadline">Deadline: —</span>
+              <span class="chip" id="metaApplicants">Applicants: —</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span class="status good" id="jobStatusPill">Open</span>
+            <a class="btn" href="company_post.html">Edit</a>
+            <a class="btn btn-ghost" href="#" onclick="toggleJob(); return false;" id="toggleBtn">Close Job</a>
+          </div>
+        </div>
+
+        <div class="grid" style="margin-top:14px;">
+          <div class="card" style="grid-column: span 12;">
+            <h3>Job Overview</h3>
+            <div style="margin-top:10px; line-height:1.9; color:var(--muted);">
+              <b style="color:var(--text);">Job ID:</b> <span id="metaId"></span><br/>
+              <b style="color:var(--text);">Category:</b> <span id="metaCategory"></span><br/>
+              <b style="color:var(--text);">Location:</b> <span id="metaLocation"></span><br/>
+              <b style="color:var(--text);">Type:</b> <span id="metaType"></span><br/>
+              <b style="color:var(--text);">Mode:</b> <span id="metaMode"></span><br/>
+              <b style="color:var(--text);">Allowance:</b> <span id="metaAllowance"></span>
+            </div>
+          </div>
+
+          <div class="card" style="grid-column: span 12;">
+            <h3>Job Description</h3>
+            <p id="jobDesc" style="margin-top:8px; line-height:1.8;"></p>
+          </div>
+
+          <div class="card" style="grid-column: span 12;">
+            <h3>Requirements & Skills</h3>
+            <p id="jobSkills" style="margin-top:8px; line-height:1.8;"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // Prototype data (no DB)
+  const jobs = [
+    {
+      id: "JP-001",
+      title: "Software Developer Intern",
+      category: "IT",
+      location: "Bangna",
+      type: "Part-time",
+      mode: "On-site",
+      allowance: "Provided",
+      posted: "25/06/2025",
+      deadline: "10/12/2025",
+      status: "Open",
+      applicantsCount: 2,
+      desc:
+        "Assist development tasks, write SQL queries, and support internal tools. Work with mentor and deliver weekly progress updates. Participate in code reviews and basic testing.",
+      skills:
+        "Python, SQL, Git. Communication, teamwork. Bonus: HTML/CSS/JS."
+    },
+    {
+      id: "JP-002",
+      title: "Data Analyst Intern",
+      category: "Business",
+      location: "Rama 9",
+      type: "Full-time",
+      mode: "Hybrid",
+      allowance: "Provided",
+      posted: "01/07/2025",
+      deadline: "20/10/2025",
+      status: "Open",
+      applicantsCount: 1,
+      desc:
+        "Support reporting by cleaning datasets, preparing weekly insights, and updating dashboards for KPI tracking.",
+      skills:
+        "Excel, basic SQL, attention to detail. Bonus: Power BI / Tableau."
+    },
+    {
+      id: "JP-003",
+      title: "UI/UX Design Intern",
+      category: "Design",
+      location: "Chatuchak",
+      type: "Part-time",
+      mode: "Remote",
+      allowance: "Not provided",
+      posted: "15/06/2025",
+      deadline: "30/09/2025",
+      status: "Closed",
+      applicantsCount: 1,
+      desc:
+        "Create wireframes and UI mockups for internal product pages. Collaborate with developers to align UI components and improve user flow.",
+      skills:
+        "Figma, UX basics, clear communication. Bonus: design system knowledge."
+    }
+  ];
+
+  let selected = 0;
+
+  function statusClass(status){
+    return (status === "Open") ? "good" : "warn";
+  }
+
+  function filteredJobs(){
+    const q = (document.getElementById("jobSearch").value || "").toLowerCase().trim();
+    if(!q) return jobs;
+    return jobs.filter(j => (
+      (j.title + " " + j.category + " " + j.location + " " + j.id).toLowerCase().includes(q)
+    ));
+  }
+
+  function renderJobList(list){
+    const el = document.getElementById("jobList");
+    el.innerHTML = list.map((j) => {
+      const isActive = (jobs[selected].id === j.id);
+      return `
+        <div onclick="selectById('${j.id}')"
+             style="padding:12px; border:1px solid var(--border); border-radius:16px;
+                    background:${isActive ? "rgba(99,102,241,.12)" : "rgba(255,255,255,.04)"}; cursor:pointer;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+            <div>
+              <b style="display:block;">${j.title}</b>
+              <small style="color:var(--muted);">${j.category} • ${j.location} • ${j.type}</small>
+              <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+                <span class="chip">${j.id}</span>
+                <span class="chip">${j.applicantsCount} applicants</span>
+              </div>
+            </div>
+            <span class="status ${statusClass(j.status)}">${j.status}</span>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderDetails(j){
+    document.getElementById("jobTitle").textContent = j.title;
+    document.getElementById("jobSubtitle").textContent =
+      `${j.category} • ${j.location} • ${j.type} • ${j.mode}`;
+
+    const pill = document.getElementById("jobStatusPill");
+    pill.className = "status " + statusClass(j.status);
+    pill.textContent = j.status;
+
+    document.getElementById("metaId").textContent = j.id;
+    document.getElementById("metaPosted").textContent = "Posted: " + j.posted;
+    document.getElementById("metaDeadline").textContent = "Deadline: " + j.deadline;
+    document.getElementById("metaApplicants").textContent = "Applicants: " + j.applicantsCount;
+
+    document.getElementById("metaCategory").textContent = j.category;
+    document.getElementById("metaLocation").textContent = j.location;
+    document.getElementById("metaType").textContent = j.type;
+    document.getElementById("metaMode").textContent = j.mode;
+    document.getElementById("metaAllowance").textContent = j.allowance;
+
+    document.getElementById("jobDesc").textContent = j.desc;
+    document.getElementById("jobSkills").textContent = j.skills;
+
+    document.getElementById("toggleBtn").textContent = (j.status === "Open") ? "Close Job" : "Reopen Job";
+  }
+
+  function selectById(id){
+    const idx = jobs.findIndex(x => x.id === id);
+    if(idx >= 0) selected = idx;
+    renderAll();
+  }
+
+  function renderAll(){
+    const list = filteredJobs();
+    // keep selection valid
+    if(list.length && !list.some(x => x.id === jobs[selected].id)){
+      selected = jobs.findIndex(x => x.id === list[0].id);
+    }
+
+    renderJobList(list.length ? list : jobs);
+    renderDetails(jobs[selected]);
+
+    document.getElementById("jobCountChip").textContent = jobs.length + " jobs";
+    document.getElementById("openCount").textContent = "Open: " + jobs.filter(x => x.status === "Open").length;
+  }
+
+  function toggleJob(){
+    const j = jobs[selected];
+    j.status = (j.status === "Open") ? "Closed" : "Open";
+    renderAll();
+    alert("Prototype: Job is now " + j.status);
+  }
+
+  document.getElementById("jobSearch").addEventListener("input", renderAll);
+
+  renderAll();
+</script>
+
+</body>
+</html>

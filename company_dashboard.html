@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Company Dashboard - CareerConnect</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Company</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">S</div>
+      <div><b>Samsung</b><small>Company Account</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a class="active" href="company_dashboard.html">Dashboard</a>
+      <a href="company_jobposts.html">Job Posts</a>
+      <a href="company_interview.html">Interview</a>
+      <a href="company_applicants.html">Applicants</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2>Company Dashboard</h2>
+        <p>Manage job posts, applicants, and interview scheduling (prototype).</p>
+      </div>
+      <a class="btn btn-ghost" href="login.html">Switch Role</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Job Posts</h3>
+        <p>Create and manage internship postings.</p>
+        <div style="margin-top:12px;">
+          <a class="btn btn-primary" href="company_jobposts.html">Open</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Applicants</h3>
+        <p>View applicants and statuses.</p>
+        <div style="margin-top:12px;">
+          <a class="btn" href="company_applicants.html">Open</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Interview</h3>
+        <p>Schedule interview date, time slot, and link.</p>
+        <div style="margin-top:12px;">
+          <a class="btn" href="company_interview.html">Open</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>
