@@ -1,0 +1,166 @@
+<!-- ===========================
+FILE: student_liked.html
+Put this in your project root (same place as student_recommended.html)
+=========================== -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Liked Internships - CareerConnect</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div>
+      <div class="brandText">CareerConnect</div>
+      <div class="pill">Student</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">E</div>
+      <div>
+        <b>Eric #12H4E</b>
+        <small>Student Account</small>
+      </div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="student_dashboard.html">Dashboard</a>
+
+      <a class="active" href="student_recommended.html">Internships</a>
+      <div class="sub">
+        <a href="student_recommended.html">Recommended Internships</a>
+        <a href="student_browse.html">Browse Internships</a>
+        <a class="active" href="student_liked.html">Liked Internships</a>
+      </div>
+
+      <a href="student_applications.html">Applications</a>
+      <a href="student_documents.html">Documents</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2>Liked Internships</h2>
+        <p>Your saved internships (prototype: stored in browser localStorage).</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-ghost" id="clearAllBtn">Clear All</button>
+        <a class="btn btn-ghost" href="student_recommended.html">Back</a>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="emptyState" id="emptyState" style="display:none;">
+      <div class="emptyIcon">♥</div>
+      <h3>No liked internships yet</h3>
+      <p>Go to Recommended Internships and tap the heart to save internships here.</p>
+      <div style="margin-top:12px;">
+        <a class="btn btn-primary" href="student_recommended.html">Go to Recommended</a>
+      </div>
+    </div>
+
+    <!-- Cards container -->
+    <div class="cards3" id="likedCards"></div>
+
+  </main>
+</div>
+
+<script>
+  const LIKE_KEY = "likedInternships";
+
+  function getLiked(){
+    try { return JSON.parse(localStorage.getItem(LIKE_KEY) || "[]"); }
+    catch(e){ return []; }
+  }
+
+  function setLiked(list){
+    localStorage.setItem(LIKE_KEY, JSON.stringify(list));
+  }
+
+  function removeLiked(id){
+    const liked = getLiked().filter(x => x.id !== id);
+    setLiked(liked);
+    renderLiked();
+  }
+
+  function clearAll(){
+    localStorage.removeItem(LIKE_KEY);
+    renderLiked();
+  }
+
+  function renderLiked(){
+    const liked = getLiked();
+    const wrap = document.getElementById("likedCards");
+    const empty = document.getElementById("emptyState");
+
+    if(!liked.length){
+      wrap.innerHTML = "";
+      empty.style.display = "block";
+      return;
+    }
+    empty.style.display = "none";
+
+    wrap.innerHTML = liked.map(it => `
+      <div class="recCard">
+        <div class="recTop">
+          <div class="badge">${it.id || "JP-XXX"}</div>
+          <button class="heart liked"
+            title="Remove from liked"
+            onclick="removeLiked('${it.id}')">♥</button>
+        </div>
+
+        <div class="thumb">Image</div>
+
+        <div class="recTitle">${escapeHtml(it.title || "Internship")}</div>
+
+        <div class="meta">
+          <div><span>Location :</span> ${escapeHtml(it.location || "-")}</div>
+          <div><span>Duration :</span> ${escapeHtml(it.duration || "-")}</div>
+          <div><span>Allowance :</span> ${escapeHtml(it.allowance || "-")}</div>
+          <div><span>Mode :</span> ${escapeHtml(it.mode || "-")}</div>
+          <div><span>Skills :</span> ${escapeHtml(it.skills || "-")}</div>
+          <div><span>Deadline :</span> ${escapeHtml(it.deadline || "-")}</div>
+        </div>
+
+        <div class="recFooter">
+          <a class="btn btn-primary btn-wide" href="student_apply.html">Apply</a>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  // small helper to avoid breaking HTML if text contains "<"
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  document.getElementById("clearAllBtn").addEventListener("click", clearAll);
+
+  // initial render
+  renderLiked();
+
+  // expose removeLiked to inline onclick
+  window.removeLiked = removeLiked;
+</script>
+
+</body>
+</html>

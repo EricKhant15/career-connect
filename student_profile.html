@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CareerConnect • Student Profile</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+
+<body>
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="brandRow">
+        <div class="logo"></div>
+        <div>
+          <div class="brandText">CareerConnect</div>
+          <div class="pill">Student</div>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div class="avatar">E</div>
+        <div>
+          <b>Eric #12H4E</b><br />
+          <small>Student Account</small>
+        </div>
+      </div>
+
+      <div class="navTitle">Menu</div>
+      <nav class="nav">
+        <a href="student_dashboard.html">Dashboard</a>
+        <a class="active" href="student_profile.html">Profile</a>
+
+        <a href="student_browse.html">Browse Internships</a>
+        <a href="student_recommended.html">Recommended</a>
+        <a href="student_applications.html">Applications</a>
+        <a href="student_documents.html">Documents</a>
+      </nav>
+
+      <div class="navFooter">
+        <a href="login.html">Switch Role</a>
+        <a href="index.html">Sign Out</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <div style="font-weight:800;">Student Profile</div>
+          <div style="color:var(--muted); font-size:12px;">Update your background & preferences for better recommendations.</div>
+        </div>
+        <div class="badge">Used for recommendations</div>
+      </div>
+
+      <div class="grid2">
+        <!-- Form Card -->
+        <section class="panel">
+          <h2 style="margin:0 0 6px;">Profile Details</h2>
+          <p style="margin:0 0 14px; color:var(--muted); font-size:13px;">
+            This information is stored in your browser (prototype mode).
+          </p>
+
+          <div class="form">
+            <label>Student ID (read-only)</label>
+            <input id="studentId" class="input" disabled />
+
+            <div class="fieldRow">
+              <div>
+                <label>Full Name</label>
+                <input id="fullName" class="input" placeholder="e.g., Khant Zaw Htet" />
+              </div>
+              <div>
+                <label>Major</label>
+                <select id="major" class="select">
+                  <option>Computer Science</option>
+                  <option>Information Technology</option>
+                  <option>Business</option>
+                  <option>Marketing</option>
+                  <option>Design</option>
+                  <option>Engineering</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="fieldRow">
+              <div>
+                <label>Expected Graduation Year</label>
+                <input id="gradYear" class="input" placeholder="e.g., 2027" />
+              </div>
+              <div>
+                <label>GPA (optional)</label>
+                <input id="gpa" class="input" placeholder="e.g., 3.45" />
+                <div class="hint">Leave blank if you don’t want to show GPA.</div>
+              </div>
+            </div>
+
+            <div class="fieldRow">
+              <div>
+                <label>Preferred Location</label>
+                <select id="location" class="select">
+                  <option>Bangna</option>
+                  <option>Rama 9</option>
+                  <option>Chatuchak</option>
+                  <option>Lat Phrao</option>
+                  <option>On-site (any)</option>
+                </select>
+              </div>
+              <div>
+                <label>Work Mode</label>
+                <select id="mode" class="select">
+                  <option>On-site</option>
+                  <option>Hybrid</option>
+                  <option>Remote</option>
+                </select>
+              </div>
+            </div>
+
+            <label>Skills (comma separated)</label>
+            <input id="skills" class="input" placeholder="Python, SQL, Git, React" />
+
+            <div style="display:flex; gap:10px; margin-top:14px; flex-wrap:wrap;">
+              <button class="btn btn-primary" type="button" onclick="saveProfile()">Save Profile</button>
+              <button class="btn btn-ghost" type="button" onclick="resetProfile()">Reset</button>
+              <a class="btn" href="student_recommended.html" style="text-decoration:none;">Go to Recommendations</a>
+              <span id="msg" style="color:var(--muted); font-size:12px; align-self:center;"></span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Preview Card -->
+        <section class="panel">
+          <h2 style="margin:0 0 6px;">Preview</h2>
+          <p style="margin:0 0 14px; color:var(--muted); font-size:13px;">
+            This is what the system will use.
+          </p>
+
+          <div id="preview" class="previewBox"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Storage key (shared across pages)
+    const KEY = "cc_student_profile_v1";
+
+    const DEFAULT_PROFILE = {
+      studentId: "12H4E",
+      fullName: "Khant Zaw Htet",
+      major: "Computer Science",
+      gradYear: "2027",
+      gpa: "3.45",
+      location: "Bangna",
+      mode: "On-site",
+      skills: "Python, SQL, Git"
+    };
+
+    function getSavedProfile() {
+      try {
+        const raw = localStorage.getItem(KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function setForm(p) {
+      document.getElementById("studentId").value = p.studentId || "";
+      document.getElementById("fullName").value = p.fullName || "";
+      document.getElementById("major").value = p.major || "Computer Science";
+      document.getElementById("gradYear").value = p.gradYear || "";
+      document.getElementById("gpa").value = p.gpa || "";
+      document.getElementById("location").value = p.location || "Bangna";
+      document.getElementById("mode").value = p.mode || "On-site";
+      document.getElementById("skills").value = p.skills || "";
+    }
+
+    function getForm() {
+      return {
+        studentId: (document.getElementById("studentId").value || "").trim(),
+        fullName: (document.getElementById("fullName").value || "").trim(),
+        major: document.getElementById("major").value,
+        gradYear: (document.getElementById("gradYear").value || "").trim(),
+        gpa: (document.getElementById("gpa").value || "").trim(),
+        location: document.getElementById("location").value,
+        mode: document.getElementById("mode").value,
+        skills: (document.getElementById("skills").value || "").trim()
+      };
+    }
+
+    function renderPreview(p) {
+      const gpaLine = p.gpa ? `<div>GPA: <b>${escapeHtml(p.gpa)}</b></div>` : "";
+      document.getElementById("preview").innerHTML = `
+        <b>${escapeHtml(p.fullName || "—")}</b>
+        <div>ID: <b>#${escapeHtml(p.studentId || "—")}</b></div>
+        <div>Major: <b>${escapeHtml(p.major || "—")}</b></div>
+        <div>Graduation: <b>${escapeHtml(p.gradYear || "—")}</b></div>
+        ${gpaLine}
+        <div>Preferred Location: <b>${escapeHtml(p.location || "—")}</b></div>
+        <div>Mode: <b>${escapeHtml(p.mode || "—")}</b></div>
+        <div>Skills: <b>${escapeHtml(p.skills || "—")}</b></div>
+      `;
+    }
+
+    function saveProfile() {
+      const p = getForm();
+
+      // quick validation (prototype-friendly)
+      if (!p.fullName) {
+        flash("Please enter your full name.", true);
+        return;
+      }
+      if (!p.gradYear || !/^\d{4}$/.test(p.gradYear)) {
+        flash("Graduation year should be a 4-digit year (e.g., 2027).", true);
+        return;
+      }
+
+      localStorage.setItem(KEY, JSON.stringify(p));
+      renderPreview(p);
+      flash("Saved ✓ (stored in browser localStorage)", false);
+    }
+
+    function resetProfile() {
+      localStorage.removeItem(KEY);
+      setForm(DEFAULT_PROFILE);
+      renderPreview(DEFAULT_PROFILE);
+      flash("Reset to default.", false);
+    }
+
+    function flash(text, isError) {
+      const el = document.getElementById("msg");
+      el.textContent = text;
+      el.style.color = isError ? "rgba(255,120,120,.9)" : "var(--muted)";
+      clearTimeout(window.__msgTimer);
+      window.__msgTimer = setTimeout(() => (el.textContent = ""), 2500);
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (m) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    // Init
+    (function init() {
+      const saved = getSavedProfile();
+      const p = saved || DEFAULT_PROFILE;
+      setForm(p);
+      renderPreview(p);
+
+      // live preview when typing (nice UX)
+      ["fullName","major","gradYear","gpa","location","mode","skills"].forEach(id => {
+        document.getElementById(id).addEventListener("input", () => renderPreview(getForm()));
+        document.getElementById(id).addEventListener("change", () => renderPreview(getForm()));
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -33,6 +33,7 @@
       <div class="sub">
         <a class="active" href="student_recommended.html">Recommended Internships</a>
         <a href="student_browse.html">Browse Internships</a>
+        <a href="student_liked.html">Liked Internships</a>
       </div>
 
       <a href="student_applications.html">Applications</a>
@@ -62,11 +63,10 @@
       <div class="recCard">
         <div class="recTop">
           <div></div>
-          <div class="heart">♡</div>
+          <div class="heart" id="heart-JP-001" onclick="toggleLike('JP-001')" title="Save internship">♡</div>
         </div>
 
         <div class="thumb">Image</div>
-
         <div class="recTitle">Company 1 (Software Developer Intern)</div>
 
         <div class="meta">
@@ -87,11 +87,10 @@
       <div class="recCard">
         <div class="recTop">
           <div></div>
-          <div class="heart">♡</div>
+          <div class="heart" id="heart-JP-002" onclick="toggleLike('JP-002')" title="Save internship">♡</div>
         </div>
 
         <div class="thumb">Image</div>
-
         <div class="recTitle">Company 2 (Data Analyst Intern)</div>
 
         <div class="meta">
@@ -112,11 +111,10 @@
       <div class="recCard">
         <div class="recTop">
           <div></div>
-          <div class="heart">♡</div>
+          <div class="heart" id="heart-JP-003" onclick="toggleLike('JP-003')" title="Save internship">♡</div>
         </div>
 
         <div class="thumb">Image</div>
-
         <div class="recTitle">Company 3 (Marketing Intern)</div>
 
         <div class="meta">
@@ -148,6 +146,52 @@
 
   </main>
 </div>
+
+<script>
+  const LIKE_KEY = "likedInternships";
+
+  const internships = [
+    { id:"JP-001", title:"Company 1 (Software Developer Intern)", location:"Bangna", duration:"3 months", allowance:"Available", mode:"On-site", skills:"Python, SQL, Git", deadline:"Dec 10, 2025" },
+    { id:"JP-002", title:"Company 2 (Data Analyst Intern)", location:"Bangkok", duration:"6 months", allowance:"Provided", mode:"Hybrid", skills:"SQL, Excel, Power BI", deadline:"Nov 25, 2025" },
+    { id:"JP-003", title:"Company 3 (Marketing Intern)", location:"Rama 9", duration:"3 months", allowance:"Available", mode:"On-site", skills:"Communication, Canva", deadline:"Oct 20, 2025" }
+  ];
+
+  function getLiked(){
+    return JSON.parse(localStorage.getItem(LIKE_KEY) || "[]");
+  }
+  function setLiked(list){
+    localStorage.setItem(LIKE_KEY, JSON.stringify(list));
+  }
+  function isLiked(id){
+    return getLiked().some(x => x.id === id);
+  }
+
+  function toggleLike(id){
+    const liked = getLiked();
+    const exists = liked.find(x => x.id === id);
+
+    if (exists){
+      setLiked(liked.filter(x => x.id !== id));
+    } else {
+      const item = internships.find(x => x.id === id);
+      if (item) liked.push(item);
+      setLiked(liked);
+    }
+    renderHearts();
+  }
+
+  function renderHearts(){
+    internships.forEach(it => {
+      const el = document.getElementById("heart-" + it.id);
+      if (!el) return;
+      const liked = isLiked(it.id);
+      el.textContent = liked ? "♥" : "♡";
+      el.classList.toggle("liked", liked);
+    });
+  }
+
+  renderHearts();
+</script>
 
 </body>
 </html>
