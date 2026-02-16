@@ -609,3 +609,102 @@ p{margin:0;color:var(--muted);line-height:1.6}
   border-color: rgba(255,120,140,.35);
   background: rgba(255,120,140,.12);
 }
+
+
+/* Internship submenu toggle */
+.nav .sub {
+  display: none;
+  margin-left: 12px;
+}
+
+.nav .sub.open {
+  display: block;
+}
+
+.nav-toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chevron {
+  opacity: 0.6;
+  font-size: 12px;
+}
+
+
+.profileLink { cursor: pointer; }
+.profileLink:hover { filter: brightness(1.08); }
+
+
+/* Modal (simple) */
+.modal { position: fixed; inset: 0; z-index: 9999; }
+.modalBackdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(4px); }
+.modalCard{
+  position: relative;
+  width: min(900px, calc(100% - 28px));
+  margin: 60px auto;
+  background: #0c1730;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.45);
+  overflow: hidden;
+}
+.modalHead{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.modalBody{ padding: 14px 16px; }
+.modalBody iframe{ width: 100%; height: 70vh; border: 0; border-radius: 12px; background: #071021; }
+.modalBody img{ max-width: 100%; border-radius: 12px; display:block; }
+
+
+/* Documents modal (simple) */
+.docModalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 9999;
+}
+.docModalCard{
+  width: min(880px, 96vw);
+  background: rgba(20,28,48,.96);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  box-shadow: 0 16px 60px rgba(0,0,0,.55);
+  overflow: hidden;
+}
+.docModalHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+.docModalBody{
+  padding: 16px;
+}
+.docModalClose{
+  background: transparent;
+  border: 0;
+  color: rgba(255,255,255,.8);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+ /* ✅ internship card image */
+  .thumb img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 14px;
+    display: block;
+  }
+
+
+  

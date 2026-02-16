@@ -1,0 +1,30 @@
+:root{
+  --bg:#0b1220;
+  --panel:#0f1a31;
+  --panel2:#111f3a;
+  --card:#0f1b33;
+  --border:rgba(255,255,255,.08);
+  --text:#eaf0ff;
+  --muted:#a9b5d9;
+  --brand:#4f7cff;
+  --brand2:#7b61ff;
+  --shadow:0 16px 40px rgba(0,0,0,.35);
+  --radius:18px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 800px at 10% 0%, rgba(79,124,255,.22), transparent 55%),
+    radial-gradient(900px 600px at 85% 25%, rgba(123,97,255,.18), transparent 55%),
+    var(--bg);
+}
+
+a{color:inherit;text-decoration:none}
+small{color:var(--muted)}
+h1,h2,h3{margin:0}
+p{margin:0;color:var(--muted);line-height:1.6}

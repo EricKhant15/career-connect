@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Apply Internship - CareerConnect</title>
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <!-- ✅ dropdown script -->
+  <script src="../js/sidebar.js" defer></script>
+
+  <!-- ✅ keep internship submenu open on this page -->
+  <style>
+    #internshipSubmenu { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <!-- Sidebar (STUDENT) -->
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div>
+      <div class="brandText">CareerConnect</div>
+      <div class="pill">Student</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">E</div>
+      <div>
+        <b>Eric #12345</b>
+        <small>Student Account</small>
+      </div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="student_dashboard.html">Dashboard</a>
+
+      <!-- Internships toggle -->
+      <a href="#" class="nav-toggle" onclick="toggleInternships(event)">
+        Internships <span class="chevron">▾</span>
+      </a>
+
+      <!-- submenu -->
+      <div class="sub" id="internshipSubmenu">
+        <a href="student_browse.html">Browse Internships</a>
+        <a href="student_recommended.html">Recommended Internships</a>
+        <a href="student_liked.html">Liked Internships</a>
+      </div>
+
+      <a href="student_applications.html">Applications</a>
+      <a href="student_documents.html">Documents</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="../login.html">Switch Role</a>
+      <a href="../index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2>Internship Application</h2>
+        <p>This form is for demonstration (no database submission yet).</p>
+      </div>
+      <a class="btn btn-ghost" href="student_dashboard.html">Back</a>
+    </div>
+
+    <!-- ✅ ONLY ONE CARD/CONTAINER (removed the extra nested card) -->
+    <div class="section" style="max-width: 980px;">
+      <div class="sectionHeader">
+        <div>
+          <b>Apply for an Internship</b>
+          <p>Fill in your details and submit (prototype).</p>
+        </div>
+        <span class="chip">Student • Apply</span>
+      </div>
+
+      <div class="grid" style="margin-top:12px;">
+        <div class="card" style="grid-column: span 6;">
+          <div class="label">Full Name</div>
+          <input class="input" placeholder="e.g., Eric AU" />
+        </div>
+
+        <div class="card" style="grid-column: span 6;">
+          <div class="label">Email</div>
+          <input class="input" placeholder="e.g., student@au.edu" />
+        </div>
+
+        <div class="card" style="grid-column: span 12;">
+          <div class="label">Select Internship</div>
+          <select class="select">
+            <option>Software Engineer Intern - Google Thailand</option>
+            <option>Marketing Intern - Shopee</option>
+            <option>Data Analyst Intern - SCG</option>
+          </select>
+        </div>
+
+        <div class="card" style="grid-column: span 12;">
+          <div class="label">Short Motivation</div>
+          <textarea class="textarea" placeholder="Why are you a good fit?"></textarea>
+        </div>
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+        <a class="btn btn-primary" href="student_dashboard.html">Submit (Prototype)</a>
+        <a class="btn btn-ghost" href="student_browse.html">Back to Browse</a>
+      </div>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

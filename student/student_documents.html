@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Documents - CareerConnect</title>
+  <link rel="stylesheet" href="../css/style.css" />
+  <style>
+    /* Simple modal (kept inside this file) */
+    .docModalOverlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 9999;
+    }
+    .docModalCard{
+      width: min(920px, 96vw);
+      max-height: 90vh;
+      background: rgba(20,28,48,.96);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      box-shadow: 0 16px 60px rgba(0,0,0,.55);
+      overflow: hidden;
+      display:flex;
+      flex-direction: column;
+    }
+    .docModalHeader{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .docModalBody{
+      padding: 16px;
+      overflow: auto;
+    }
+    .docModalClose{
+      background: transparent;
+      border: 0;
+      color: rgba(255,255,255,.8);
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .docActionsRow{
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .docMetaSmall{
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .docPreview{
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      min-height: 520px;
+      background: rgba(255,255,255,.04);
+    }
+    .docImgPreview{
+      max-width: 100%;
+      border-radius: 12px;
+      background: rgba(255,255,255,.04);
+      display:block;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Student</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">E</div>
+      <div><b>Eric #12345</b><small>Student Account</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="student_dashboard.html">Dashboard</a>
+      <a href="student_browse.html">Internships</a>
+      <a href="student_applications.html">Applications</a>
+      <a class="active" href="student_documents.html">Documents</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <h2>Documents</h2>
+        <p>Manage your personal documents for internship applications.</p>
+      </div>
+      <a class="btn btn-primary" href="student_apply.html">Use in Application</a>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Personal Documents</h3>
+
+        <ul class="list" style="margin-top:12px;">
+          <!-- Resume -->
+          <li class="item" data-doc="resume">
+            <div>
+              <b>Resume (CV)</b><br>
+              <small>Status: <span class="inlineStatus">Missing</span></small>
+            </div>
+            <div class="right">
+              <span class="status warn">Missing</span>
+              <div class="actionsSlot">
+                <a class="btn btn-primary" href="#" onclick="uploadDoc('resume'); return false;">Upload</a>
+              </div>
+            </div>
+          </li>
+
+          <!-- Transcript -->
+          <li class="item" data-doc="transcript">
+            <div>
+              <b>Transcript</b><br>
+              <small>Status: <span class="inlineStatus">Missing</span></small>
+            </div>
+            <div class="right">
+              <span class="status warn">Missing</span>
+              <div class="actionsSlot">
+                <a class="btn btn-primary" href="#" onclick="uploadDoc('transcript'); return false;">Upload</a>
+              </div>
+            </div>
+          </li>
+
+          <!-- Cover Letter -->
+          <li class="item" data-doc="coverLetter">
+            <div>
+              <b>Cover Letter</b><br>
+              <small>Status: <span class="inlineStatus">Missing</span></small>
+            </div>
+            <div class="right">
+              <span class="status warn">Missing</span>
+              <div class="actionsSlot">
+                <a class="btn btn-primary" href="#" onclick="uploadDoc('coverLetter'); return false;">Upload</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Other Documents</h3>
+
+        <ul class="list" style="margin-top:12px;">
+          <!-- Recommendation -->
+          <li class="item" data-doc="recommendation">
+            <div>
+              <b>Recommendation Letter</b><br>
+              <small>Status: <span class="inlineStatus">Missing</span></small>
+            </div>
+            <div class="right">
+              <span class="status warn">Missing</span>
+              <div class="actionsSlot">
+                <a class="btn btn-primary" href="#" onclick="uploadDoc('recommendation'); return false;">Upload</a>
+              </div>
+            </div>
+          </li>
+
+          <!-- Portfolio -->
+          <li class="item" data-doc="portfolio">
+            <div>
+              <b>Portfolio (PDF/Link)</b><br>
+              <small>Status: <span class="inlineStatus">Missing</span></small>
+            </div>
+            <div class="right">
+              <span class="status warn">Missing</span>
+              <div class="actionsSlot">
+                <a class="btn btn-primary" href="#" onclick="uploadDoc('portfolio'); return false;">Upload</a>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div id="docModal" class="docModalOverlay">
+  <div class="docModalCard">
+    <div class="docModalHeader">
+      <b id="docModalTitle">Document</b>
+      <button class="docModalClose" onclick="closeDocModal()">✕</button>
+    </div>
+    <div class="docModalBody">
+      <div class="docActionsRow">
+        <div class="docMetaSmall" id="docMeta">File: -</div>
+        <div style="display:flex; gap:8px; flex-wrap: wrap;">
+          <button class="btn" id="removeBtn" onclick="removeDoc()">Remove</button>
+          <button class="btn btn-primary" id="replaceBtn" onclick="replaceDoc()">Replace</button>
+        </div>
+      </div>
+      <div id="docPreviewWrap"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORE_KEY = "student_documents_v1";
+  const titleMap = {
+    resume: "Resume (CV)",
+    transcript: "Transcript",
+    coverLetter: "Cover Letter",
+    recommendation: "Recommendation Letter",
+    portfolio: "Portfolio"
+  };
+
+  let currentDocId = null;
+
+  function loadStore(){
+    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); }
+    catch { return {}; }
+  }
+
+  function saveStore(data){
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  }
+
+  function setRowState(docId, exists){
+    const row = document.querySelector(`[data-doc="${docId}"]`);
+    if(!row) return;
+
+    const statusBadge = row.querySelector(".status");
+    const inlineStatus = row.querySelector(".inlineStatus");
+    const actionsSlot = row.querySelector(".actionsSlot");
+
+    if(exists){
+      statusBadge.textContent = "Uploaded";
+      statusBadge.classList.remove("warn");
+      statusBadge.classList.add("ok");
+
+      inlineStatus.textContent = "Uploaded";
+
+      actionsSlot.innerHTML = `
+        <a class="btn" href="#" onclick="viewDoc('${docId}'); return false;">View</a>
+      `;
+    } else {
+      statusBadge.textContent = "Missing";
+      statusBadge.classList.remove("ok");
+      statusBadge.classList.add("warn");
+
+      inlineStatus.textContent = "Missing";
+
+      actionsSlot.innerHTML = `
+        <a class="btn btn-primary" href="#" onclick="uploadDoc('${docId}'); return false;">Upload</a>
+      `;
+    }
+  }
+
+  function renderAll(){
+    const data = loadStore();
+    Object.keys(titleMap).forEach(id => {
+      setRowState(id, !!data[id]);
+    });
+  }
+
+  function uploadDoc(docId){
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".pdf,.png,.jpg,.jpeg";
+    input.onchange = () => {
+      const file = input.files && input.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const data = loadStore();
+        data[docId] = {
+          name: file.name,
+          type: file.type,
+          dataUrl: reader.result,
+          uploadedAt: new Date().toISOString()
+        };
+        saveStore(data);
+        renderAll();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function viewDoc(docId){
+    const data = loadStore();
+    const doc = data[docId];
+
+    currentDocId = docId;
+
+    if(!doc){
+      // if missing, open modal with upload CTA
+      openDocModal(titleMap[docId] || "Document");
+      document.getElementById("docMeta").textContent = "No file uploaded.";
+      document.getElementById("docPreviewWrap").innerHTML = `
+        <p style="margin:0 0 12px 0;">You haven't uploaded this document yet.</p>
+        <button class="btn btn-primary" onclick="uploadDoc('${docId}')">Upload now</button>
+      `;
+      document.getElementById("removeBtn").style.display = "none";
+      document.getElementById("replaceBtn").style.display = "none";
+      return;
+    }
+
+    openDocModal(titleMap[docId] || "Document");
+    document.getElementById("docMeta").textContent = "File: " + (doc.name || "-");
+    document.getElementById("removeBtn").style.display = "inline-block";
+    document.getElementById("replaceBtn").style.display = "inline-block";
+
+    const wrap = document.getElementById("docPreviewWrap");
+    const type = (doc.type || "").toLowerCase();
+
+    if(type.includes("pdf")){
+      wrap.innerHTML = `<iframe class="docPreview" src="${doc.dataUrl}"></iframe>`;
+    } else if(type.startsWith("image/")){
+      wrap.innerHTML = `<img class="docImgPreview" src="${doc.dataUrl}" alt="Document preview" />`;
+    } else {
+      wrap.innerHTML = `<p>Preview not supported for this file type.</p>`;
+    }
+  }
+
+  function openDocModal(title){
+    document.getElementById("docModalTitle").textContent = title;
+    document.getElementById("docModal").style.display = "flex";
+  }
+
+  function closeDocModal(){
+    document.getElementById("docModal").style.display = "none";
+  }
+
+  // close modal when clicking outside
+  document.getElementById("docModal").addEventListener("click", (e) => {
+    if(e.target.id === "docModal") closeDocModal();
+  });
+
+  function removeDoc(){
+    if(!currentDocId) return;
+    const data = loadStore();
+    delete data[currentDocId];
+    saveStore(data);
+    closeDocModal();
+    renderAll();
+  }
+
+  function replaceDoc(){
+    if(!currentDocId) return;
+    uploadDoc(currentDocId);
+  }
+
+  // initial render
+  renderAll();
+</script>
+
+</body>
+</html>

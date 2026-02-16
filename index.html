@@ -6,60 +6,112 @@
   <title>CareerConnect</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
+
 <body>
-  <div class="container">
-    <div class="topbar">
-      <div class="brand">
+  <div class="app">
+    <!-- Sidebar (landing) -->
+    <aside class="sidebar">
+      <div class="brandRow">
         <div class="logo"></div>
-        <div>CareerConnect</div>
-        <div class="badge">Prototype (No DB)</div>
-      </div>
-      <a class="btn btn-ghost" href="login.html">Enter</a>
-    </div>
-
-    <div class="hero">
-      <h1>Internship Management, made simple.</h1>
-      <p>
-        CareerConnect connects Students, Companies, and Admins in one platform.
-        This prototype demonstrates complete user flows and page transitions (database will be integrated later).
-      </p>
-      <div>
-        <a class="btn btn-primary" href="login.html">Enter System</a>
-        <a class="btn" href="login.html">Choose Role</a>
-      </div>
-    </div>
-
-    <div class="section-title">Quick Demo Paths</div>
-    <div class="grid">
-      <div class="card">
-        <h3>Student</h3>
-        <p>Browse internships and submit an application.</p>
-        <a class="btn" href="student_dashboard.html">Open Student Dashboard</a>
+        <div class="brandText">CareerConnect</div>
+        <div class="pill">Prototype</div>
       </div>
 
-      <div class="card">
-        <h3>Company</h3>
-        <p>Create internship postings for students.</p>
-        <a class="btn" href="company_dashboard.html">Open Company Dashboard</a>
+      <div class="profile">
+        <div class="avatar">CC</div>
+        <div>
+          <b>Welcome</b>
+          <small>Prototype (No DB)</small>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>Admin</h3>
-        <p>Manage users and review system overview.</p>
-        <a class="btn" href="admin_dashboard.html">Open Admin Dashboard</a>
+      <div class="navTitle">Quick Demo Paths</div>
+      <nav class="nav">
+        <a href="student/student_dashboard.html">Student Dashboard</a>
+        <a href="company_dashboard.html">Company Dashboard</a>
+        <a href="admin_dashboard.html">Admin Dashboard</a>
+        <a href="login.html">Role Selector</a>
+      </nav>
+
+      <div class="navFooter">
+        <a href="login.html">Enter System</a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- Topbar -->
+      <div class="topbar">
+        <div class="search">
+          <span style="color:var(--muted);font-weight:800;">🔎</span>
+          <input placeholder="Search roles, pages, demo paths..." />
+        </div>
+        <div class="actions">
+          <a class="btn btn-ghost" href="login.html">Choose Role</a>
+          <a class="btn btn-primary" href="login.html">Enter</a>
+        </div>
       </div>
 
-      <div class="card">
-        <h3>Submission-ready</h3>
-        <p>Designed for screenshot sequences of all functions.</p>
-        <a class="btn" href="login.html">Open Role Selector</a>
-      </div>
-    </div>
+      <!-- Hero Card -->
+      <div class="card" style="grid-column: span 12;">
+        <div class="cardTitle">
+          <div>
+            <h2>Internship Management, made simple.</h2>
+            <p>
+              CareerConnect connects Students, Companies, and Admins in one platform.
+              This prototype demonstrates complete user flows and page transitions (database will be integrated later).
+            </p>
+          </div>
+          <span class="status good">Prototype Mode</span>
+        </div>
 
-    <div class="footer">
-      <div>© CareerConnect Prototype</div>
-      <div>Role-based transitions • Pre-set data</div>
-    </div>
+        <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn btn-primary" href="login.html">Enter System</a>
+          <a class="btn" href="login.html">Choose Role</a>
+        </div>
+      </div>
+
+      <!-- Demo Cards -->
+      <div class="grid" style="margin-top:14px;">
+        <div class="card">
+          <h3>Student</h3>
+          <p>Browse internships and submit an application.</p>
+          <div style="margin-top:12px;">
+            <a class="btn btn-primary" href="student/student_dashboard.html">Open Student Dashboard</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Company</h3>
+          <p>Create internship postings for students.</p>
+          <div style="margin-top:12px;">
+            <a class="btn btn-primary" href="company_dashboard.html">Open Company Dashboard</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Admin</h3>
+          <p>Manage users and review system overview.</p>
+          <div style="margin-top:12px;">
+            <a class="btn btn-primary" href="admin_dashboard.html">Open Admin Dashboard</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Submission-ready</h3>
+          <p>Designed for screenshot sequences of all functions.</p>
+          <div style="margin-top:12px;">
+            <a class="btn" href="login.html">Open Role Selector</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="margin-top:14px; color:var(--muted); font-size:12px;">
+        <div>© CareerConnect Prototype</div>
+        <div>Role-based transitions • Pre-set data</div>
+      </div>
+    </main>
   </div>
 </body>
 </html>

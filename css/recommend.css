@@ -1,0 +1,167 @@
+/* --- Recommended internships cards (prototype-like) --- */
+.cards3{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:18px;
+  margin-top:14px;
+}
+
+.recCard{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.03);
+  border-radius: 22px;
+  padding:14px;
+  min-height: 520px;
+  display:flex;
+  flex-direction:column;
+  position: relative;
+}
+
+.recTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:10px;
+}
+
+.thumb{
+  height:120px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: var(--muted);
+  font-weight:800;
+}
+
+.recTitle{
+  margin-top:10px;
+  font-weight:900;
+}
+
+.meta{
+  margin-top:10px;
+  color: var(--text);
+  font-size:14px;
+  line-height:1.9;
+}
+.meta span{ color: var(--muted); }
+
+.recFooter{
+  margin-top:auto;
+  padding-top:14px;
+  display:flex;
+  justify-content:center;
+}
+
+.btn-wide{
+  width:100%;
+  justify-content:center;
+  padding:12px 14px;
+  border-radius: 16px;
+}
+
+.pager{
+  margin-top:16px;
+  display:flex;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+.pageBtn{
+  min-width:42px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  color: var(--text);
+  font-weight:900;
+  text-align:center;
+}
+.pageBtn:hover{ background: rgba(255,255,255,.08); }
+.pageBtn.active{
+  background: rgba(255,255,255,.14);
+}
+
+/* Heart icon + liked state */
+.heart{
+  width:34px;height:34px;
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color: var(--muted);
+  font-size:18px;
+  cursor:pointer;
+  transition:.15s ease;
+  user-select:none;
+}
+.heart:hover{ background: rgba(255,255,255,.08); }
+
+.heart.liked{
+  color: rgba(255,120,140,1);
+  border-color: rgba(255,120,140,.35);
+  background: rgba(255,120,140,.12);
+}
+
+/* Alternative heart button */
+.heartBtn{
+  position:absolute;
+  top:14px;
+  right:14px;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.80);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:.15s ease;
+}
+.heartBtn:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.09);
+}
+.heartBtn.liked{
+  color: rgba(255,120,140,1);
+  border-color: rgba(255,120,140,.35);
+  background: rgba(255,120,140,.12);
+}
+
+/* Empty state (Liked internships) */
+.emptyState{
+  margin-top:14px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  border-radius: var(--radius);
+  padding:18px;
+  text-align:center;
+}
+
+.emptyIcon{
+  width:54px;height:54px;
+  border-radius: 16px;
+  margin: 0 auto 10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid var(--border);
+  background: rgba(255,120,140,.10);
+  color: rgba(255,120,140,1);
+  font-size:22px;
+  font-weight:900;
+}
+
+@media (max-width: 980px){
+  .cards3{ grid-template-columns: 1fr; }
+  .recCard{ min-height: auto; }
+}

@@ -4,12 +4,21 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Recommended Internships - CareerConnect</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <!-- ✅ add this so the dropdown works -->
+  <script src="../js/sidebar.js" defer></script>
+
+  <!-- ✅ (optional) keep submenu OPEN by default on this page -->
+  <style>
+    /* If your sidebar.js hides it with display:none, this forces it open here */
+    #internshipSubmenu { display: block; }
+  </style>
 </head>
 <body>
 
 <div class="app">
-  <!-- Sidebar -->
+  <!-- Sidebar (STUDENT) -->
   <aside class="sidebar">
     <div class="brandRow">
       <div class="logo"></div>
@@ -20,7 +29,7 @@
     <div class="profile">
       <div class="avatar">E</div>
       <div>
-        <b>Eric #12H4E</b>
+        <b>Eric #12345</b>
         <small>Student Account</small>
       </div>
     </div>
@@ -29,10 +38,15 @@
     <nav class="nav">
       <a href="student_dashboard.html">Dashboard</a>
 
-      <a class="active" href="student_recommended.html">Internships</a>
-      <div class="sub">
-        <a class="active" href="student_recommended.html">Recommended Internships</a>
+      <!-- ✅ Internship toggle -->
+      <a href="#" class="nav-toggle" onclick="toggleInternships(event)">
+        Internships <span class="chevron">▾</span>
+      </a>
+
+      <!-- ✅ submenu -->
+      <div class="sub" id="internshipSubmenu">
         <a href="student_browse.html">Browse Internships</a>
+        <a class="active" href="student_recommended.html">Recommended Internships</a>
         <a href="student_liked.html">Liked Internships</a>
       </div>
 
@@ -41,8 +55,8 @@
     </nav>
 
     <div class="navFooter">
-      <a href="login.html">Switch Role</a>
-      <a href="index.html">Sign Out</a>
+      <a href="../login.html">Switch Role</a>
+      <a href="../index.html">Sign Out</a>
     </div>
   </aside>
 
@@ -66,8 +80,10 @@
           <div class="heart" id="heart-JP-001" onclick="toggleLike('JP-001')" title="Save internship">♡</div>
         </div>
 
-        <div class="thumb">Image</div>
-        <div class="recTitle">Company 1 (Software Developer Intern)</div>
+<div class="thumb">
+  <img src="../assets/001.jpg" alt="Company 1 internship" />
+</div>
+        <div class="recTitle">Google (Software Developer Intern)</div>
 
         <div class="meta">
           <div><span>Location :</span> Bangna</div>
@@ -90,8 +106,10 @@
           <div class="heart" id="heart-JP-002" onclick="toggleLike('JP-002')" title="Save internship">♡</div>
         </div>
 
-        <div class="thumb">Image</div>
-        <div class="recTitle">Company 2 (Data Analyst Intern)</div>
+<div class="thumb">
+  <img src="../assets/002.jpg" alt="Company 2 internship" />
+</div>
+        <div class="recTitle">Meta (Data Analyst Intern)</div>
 
         <div class="meta">
           <div><span>Location :</span> Bangkok</div>
@@ -114,8 +132,10 @@
           <div class="heart" id="heart-JP-003" onclick="toggleLike('JP-003')" title="Save internship">♡</div>
         </div>
 
-        <div class="thumb">Image</div>
-        <div class="recTitle">Company 3 (Marketing Intern)</div>
+<div class="thumb">
+  <img src="../assets/003.jpg" alt="Company 3 internship" />
+</div>
+        <div class="recTitle">Tik Tok (Marketing Intern)</div>
 
         <div class="meta">
           <div><span>Location :</span> Rama 9</div>

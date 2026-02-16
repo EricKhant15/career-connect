@@ -1,14 +1,26 @@
-<!-- ===========================
-FILE: student_liked.html
-Put this in your project root (same place as student_recommended.html)
-=========================== -->
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Liked Internships - CareerConnect</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="../css/style.css" />
+
+  <!-- Sidebar dropdown logic -->
+  <script src="../js/sidebar.js" defer></script>
+
+  <!-- Keep internship submenu open on this page -->
+  <style>
+    #internshipSubmenu { display: block; }
+
+    .thumb img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 14px;
+      display: block;
+    }
+  </style>
 </head>
 <body>
 
@@ -24,7 +36,7 @@ Put this in your project root (same place as student_recommended.html)
     <div class="profile">
       <div class="avatar">E</div>
       <div>
-        <b>Eric #12H4E</b>
+        <b>Eric #12345</b>
         <small>Student Account</small>
       </div>
     </div>
@@ -33,10 +45,14 @@ Put this in your project root (same place as student_recommended.html)
     <nav class="nav">
       <a href="student_dashboard.html">Dashboard</a>
 
-      <a class="active" href="student_recommended.html">Internships</a>
-      <div class="sub">
-        <a href="student_recommended.html">Recommended Internships</a>
+      <!-- Internship toggle -->
+      <a href="#" class="nav-toggle" onclick="toggleInternships(event)">
+        Internships <span class="chevron">▾</span>
+      </a>
+
+      <div class="sub" id="internshipSubmenu">
         <a href="student_browse.html">Browse Internships</a>
+        <a href="student_recommended.html">Recommended Internships</a>
         <a class="active" href="student_liked.html">Liked Internships</a>
       </div>
 
@@ -45,8 +61,8 @@ Put this in your project root (same place as student_recommended.html)
     </nav>
 
     <div class="navFooter">
-      <a href="login.html">Switch Role</a>
-      <a href="index.html">Sign Out</a>
+      <a href="../login.html">Switch Role</a>
+      <a href="../index.html">Sign Out</a>
     </div>
   </aside>
 
@@ -55,7 +71,7 @@ Put this in your project root (same place as student_recommended.html)
     <div class="topbar">
       <div>
         <h2>Liked Internships</h2>
-        <p>Your saved internships (prototype: stored in browser localStorage).</p>
+        <p>Your saved internships (stored in browser localStorage).</p>
       </div>
       <div class="actions">
         <button class="btn btn-ghost" id="clearAllBtn">Clear All</button>
@@ -69,22 +85,33 @@ Put this in your project root (same place as student_recommended.html)
       <h3>No liked internships yet</h3>
       <p>Go to Recommended Internships and tap the heart to save internships here.</p>
       <div style="margin-top:12px;">
-        <a class="btn btn-primary" href="student_recommended.html">Go to Recommended</a>
+        <a class="btn btn-primary" href="student_recommended.html">
+          Go to Recommended
+        </a>
       </div>
     </div>
 
-    <!-- Cards container -->
+    <!-- Cards -->
     <div class="cards3" id="likedCards"></div>
-
   </main>
 </div>
 
 <script>
   const LIKE_KEY = "likedInternships";
 
+  // Map internship ID to image
+  const IMAGE_MAP = {
+    "JP-001": "../assets/001.jpg",
+    "JP-002": "../assets/002.jpg",
+    "JP-003": "../assets/003.jpg",
+  };
+
   function getLiked(){
-    try { return JSON.parse(localStorage.getItem(LIKE_KEY) || "[]"); }
-    catch(e){ return []; }
+    try {
+      return JSON.parse(localStorage.getItem(LIKE_KEY) || "[]");
+    } catch {
+      return [];
+    }
   }
 
   function setLiked(list){
@@ -92,8 +119,7 @@ Put this in your project root (same place as student_recommended.html)
   }
 
   function removeLiked(id){
-    const liked = getLiked().filter(x => x.id !== id);
-    setLiked(liked);
+    setLiked(getLiked().filter(x => x.id !== id));
     renderLiked();
   }
 
@@ -107,43 +133,48 @@ Put this in your project root (same place as student_recommended.html)
     const wrap = document.getElementById("likedCards");
     const empty = document.getElementById("emptyState");
 
-    if(!liked.length){
+    if (!liked.length){
       wrap.innerHTML = "";
       empty.style.display = "block";
       return;
     }
+
     empty.style.display = "none";
 
-    wrap.innerHTML = liked.map(it => `
-      <div class="recCard">
-        <div class="recTop">
-          <div class="badge">${it.id || "JP-XXX"}</div>
-          <button class="heart liked"
-            title="Remove from liked"
-            onclick="removeLiked('${it.id}')">♥</button>
+    wrap.innerHTML = liked.map(it => {
+      const img = IMAGE_MAP[it.id] || "../assets/default.jpg";
+      return `
+        <div class="recCard">
+          <div class="recTop">
+            <div class="badge">${it.id}</div>
+            <button class="heart liked"
+              title="Remove"
+              onclick="removeLiked('${it.id}')">♥</button>
+          </div>
+
+          <div class="thumb">
+            <img src="${img}" alt="${escapeHtml(it.title)}">
+          </div>
+
+          <div class="recTitle">${escapeHtml(it.title)}</div>
+
+          <div class="meta">
+            <div><span>Location :</span> ${escapeHtml(it.location)}</div>
+            <div><span>Duration :</span> ${escapeHtml(it.duration)}</div>
+            <div><span>Allowance :</span> ${escapeHtml(it.allowance)}</div>
+            <div><span>Mode :</span> ${escapeHtml(it.mode)}</div>
+            <div><span>Skills :</span> ${escapeHtml(it.skills)}</div>
+            <div><span>Deadline :</span> ${escapeHtml(it.deadline)}</div>
+          </div>
+
+          <div class="recFooter">
+            <a class="btn btn-primary btn-wide" href="student_apply.html">Apply</a>
+          </div>
         </div>
-
-        <div class="thumb">Image</div>
-
-        <div class="recTitle">${escapeHtml(it.title || "Internship")}</div>
-
-        <div class="meta">
-          <div><span>Location :</span> ${escapeHtml(it.location || "-")}</div>
-          <div><span>Duration :</span> ${escapeHtml(it.duration || "-")}</div>
-          <div><span>Allowance :</span> ${escapeHtml(it.allowance || "-")}</div>
-          <div><span>Mode :</span> ${escapeHtml(it.mode || "-")}</div>
-          <div><span>Skills :</span> ${escapeHtml(it.skills || "-")}</div>
-          <div><span>Deadline :</span> ${escapeHtml(it.deadline || "-")}</div>
-        </div>
-
-        <div class="recFooter">
-          <a class="btn btn-primary btn-wide" href="student_apply.html">Apply</a>
-        </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
   }
 
-  // small helper to avoid breaking HTML if text contains "<"
   function escapeHtml(str){
     return String(str)
       .replaceAll("&","&amp;")
@@ -155,10 +186,7 @@ Put this in your project root (same place as student_recommended.html)
 
   document.getElementById("clearAllBtn").addEventListener("click", clearAll);
 
-  // initial render
   renderLiked();
-
-  // expose removeLiked to inline onclick
   window.removeLiked = removeLiked;
 </script>
 
