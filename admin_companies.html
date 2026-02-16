@@ -63,60 +63,102 @@
 </div>
 
 <script>
-  const companies = [
-    { name:"TechCo Solutions", industry:"Technology", email:"hr@techco.com", status:"Pending" },
-    { name:"BrightFuture Marketing", industry:"Marketing", email:"contact@bfm.co", status:"Approved" },
-    { name:"EduWorld International", industry:"Education", email:"admin@eduworld.org", status:"Approved" },
-    { name:"GreenCare Services", industry:"Environment", email:"info@greencare.sg", status:"Rejected" },
-    { name:"ProSoft Digital", industry:"Software", email:"support@prosoft.com", status:"Pending" }
-  ];
+  // For demo, we hardcode admin id = 1 (you can change later)
+  const ADMIN_ID = 1;
+
+  let companies = [];
 
   function statusClass(s){
-    if(s==="Approved") return "ok";
-    if(s==="Rejected") return "warn";
+    if(s === "Approved") return "ok";
+    if(s === "Rejected") return "warn";
     return "good"; // Pending
   }
 
-  function render(){
-    const q = (document.getElementById("q").value || "").toLowerCase().trim();
-    const list = !q ? companies : companies.filter(c =>
-      (c.name + " " + c.industry + " " + c.email).toLowerCase().includes(q)
-    );
+  async function loadCompanies() {
+    const r = await fetch("/api/admin/companies");
+    const out = await r.json();
+    if (!r.ok || !out.ok) throw new Error(out.error || "Failed to load companies");
+    companies = out.companies || [];
+    render();
+  }
 
-    document.getElementById("rows").innerHTML = list.map((c, i) => `
+  function filteredList() {
+    const q = (document.getElementById("q").value || "").toLowerCase().trim();
+    if (!q) return companies;
+    return companies.filter(c =>
+      (`${c.company_name} ${c.industry || ""} ${c.email}`).toLowerCase().includes(q)
+    );
+  }
+
+  function render(){
+    const list = filteredList();
+
+    document.getElementById("rows").innerHTML = list.map((c) => `
       <tr>
-        <td><b>${c.name}</b></td>
-        <td>${c.industry}</td>
-        <td>${c.email}</td>
-        <td><span class="status ${statusClass(c.status)}">${c.status}</span></td>
+        <td><b>${escapeHtml(c.company_name)}</b></td>
+        <td>${escapeHtml(c.industry || "-")}</td>
+        <td>${escapeHtml(c.email)}</td>
+        <td><span class="status ${statusClass(c.verified_status)}">${escapeHtml(c.verified_status)}</span></td>
         <td style="text-align:right;">
-          <button class="btn" onclick="view(${i})">View</button>
-          <button class="btn btn-primary" onclick="setStatus(${i}, 'Approved')">Approve</button>
-          <button class="btn btn-ghost" onclick="setStatus(${i}, 'Rejected')">Reject</button>
+          <button class="btn" onclick="viewCompany(${c.company_id})">View</button>
+          <button class="btn btn-primary" onclick="setStatus(${c.company_id}, 'Approved')">Approve</button>
+          <button class="btn btn-ghost" onclick="setStatus(${c.company_id}, 'Rejected')">Reject</button>
         </td>
       </tr>
     `).join("") || `<tr><td colspan="5" style="color:var(--muted);">No results.</td></tr>`;
   }
 
-  function setStatus(i, s){
-    const q = (document.getElementById("q").value || "").toLowerCase().trim();
-    const list = !q ? companies : companies.filter(c =>
-      (c.name + " " + c.industry + " " + c.email).toLowerCase().includes(q)
-    );
-    const target = list[i];
-    const idx = companies.findIndex(x => x.name === target.name);
-    companies[idx].status = s;
-    render();
-    alert("Prototype: " + target.name + " is now " + s);
+  async function setStatus(companyId, status){
+    try {
+      const r = await fetch("/api/admin/companies/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ company_id: companyId, status, admin_id: ADMIN_ID })
+      });
+      const out = await r.json();
+      if (!r.ok || !out.ok) throw new Error(out.error || "Update failed");
+
+      // Update local list so UI refreshes without reloading everything
+      const idx = companies.findIndex(x => x.company_id === companyId);
+      if (idx !== -1) companies[idx].verified_status = out.company.verified_status;
+
+      render();
+      alert(`✅ ${out.company.company_name} is now ${out.company.verified_status}`);
+    } catch (e) {
+      alert("❌ " + (e.message || "Update failed"));
+    }
   }
 
-  function view(i){
-    alert("Prototype view:\nCompany details page not required for this submission.");
+  function viewCompany(companyId){
+    const c = companies.find(x => x.company_id === companyId);
+    if (!c) return alert("Company not found");
+    alert(
+      `Company Details\n\n` +
+      `Name: ${c.company_name}\n` +
+      `Industry: ${c.industry || "-"}\n` +
+      `Email: ${c.email}\n` +
+      `Status: ${c.verified_status}\n`
+    );
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
   document.getElementById("q").addEventListener("input", render);
-  render();
+
+  // initial load from DB
+  loadCompanies().catch(err => {
+    document.getElementById("rows").innerHTML =
+      `<tr><td colspan="5" style="color:var(--muted);">Failed to load companies: ${escapeHtml(err.message)}</td></tr>`;
+  });
 </script>
+
 
 </body>
 </html>

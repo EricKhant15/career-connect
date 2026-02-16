@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Role Selection - CareerConnect</title>
+  <title>Login - CareerConnect</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 
@@ -19,55 +19,257 @@
       <div class="profile">
         <div class="avatar">CC</div>
         <div>
-          <b>Role Selection</b>
-          <small>Prototype (No DB)</small>
+          <b>Authentication</b>
+          <small>Connected to DB</small>
         </div>
       </div>
 
       <div class="navTitle">Navigation</div>
       <nav class="nav">
         <a href="index.html">Home</a>
-        <a class="active" href="login.html">Choose Role</a>
+        <a class="active" href="login.html">Login/Register</a>
       </nav>
     </aside>
 
     <!-- Main -->
     <main class="main">
-      <!-- Role selection card -->
       <div class="card" style="grid-column: span 12;">
         <div class="cardTitle">
           <div>
-            <h2>Choose a role</h2>
+            <h2>Login</h2>
+            <small>Select a role, then login (and register if needed).</small>
           </div>
         </div>
 
+        <!-- Role tabs -->
+        <div class="grid" style="margin-top:14px; grid-template-columns: repeat(3, 1fr); gap: 14px;">
+          <button class="card" id="roleStudent" type="button" style="text-align:left; cursor:pointer;">
+            <h3 style="margin:0 0 6px;">Student</h3>
+            <p style="margin:0;">Browse internships and apply.</p>
+          </button>
+
+          <button class="card" id="roleCompany" type="button" style="text-align:left; cursor:pointer;">
+            <h3 style="margin:0 0 6px;">Company</h3>
+            <p style="margin:0;">Post internship opportunities.</p>
+          </button>
+
+          <button class="card" id="roleAdmin" type="button" style="text-align:left; cursor:pointer;">
+            <h3 style="margin:0 0 6px;">Admin</h3>
+            <p style="margin:0;">Manage and verify companies.</p>
+          </button>
+        </div>
+
+        <!-- Message area -->
+        <div id="msg" class="card" style="margin-top:14px; display:none;">
+          <b id="msgTitle"></b>
+          <div id="msgText" style="margin-top:6px;"></div>
+        </div>
+
+        <!-- Forms -->
         <div class="grid" style="margin-top:14px;">
-          <div class="card">
-            <h3>Student</h3>
-            <p>Browse internships and apply.</p>
-            <div style="margin-top:12px;">
-              <a class="btn btn-primary" href="student/student_dashboard.html">Continue</a>
-            </div>
+          <!-- Login card -->
+          <div class="card" style="grid-column: span 6;">
+            <h3 style="margin-top:0;">Login</h3>
+
+            <form id="loginForm">
+              <div style="display:grid; gap:10px; margin-top:10px;">
+                <input id="login_email" type="email" placeholder="Email" required />
+                <input id="login_password" type="password" placeholder="Password" required />
+                <button class="btn btn-primary" type="submit">Login</button>
+              </div>
+            </form>
+
+            <small style="display:block; margin-top:10px;">
+              Demo note: this is a DB project. We keep auth simple (no sessions yet).
+            </small>
           </div>
 
-          <div class="card">
-            <h3>Company</h3>
-            <p>Post internship opportunities.</p>
-            <div style="margin-top:12px;">
-              <a class="btn btn-primary" href="company_dashboard.html">Continue</a>
-            </div>
-          </div>
+          <!-- Register card -->
+          <div class="card" style="grid-column: span 6;" id="registerCard">
+            <h3 style="margin-top:0;">Register</h3>
 
-          <div class="card">
-            <h3>Admin</h3>
-            <p>Manage users and review overview.</p>
-            <div style="margin-top:12px;">
-              <a class="btn btn-primary" href="admin_dashboard.html">Continue</a>
-            </div>
+            <form id="registerForm">
+              <div style="display:grid; gap:10px; margin-top:10px;">
+                <!-- Student fields -->
+                <div id="studentFields" style="display:grid; gap:10px;">
+                  <input id="reg_first_name" type="text" placeholder="First name" required />
+                  <input id="reg_last_name" type="text" placeholder="Last name" required />
+                </div>
+
+                <!-- Company fields -->
+                <div id="companyFields" style="display:none; gap:10px;">
+                  <input id="reg_company_name" type="text" placeholder="Company name" />
+                </div>
+
+                <input id="reg_email" type="email" placeholder="Email" required />
+                <input id="reg_password" type="password" placeholder="Password" required />
+
+                <button class="btn btn-primary" type="submit">Create account</button>
+              </div>
+            </form>
+
+            <small id="registerHint" style="display:block; margin-top:10px;">
+              Register is available for Student/Company only.
+            </small>
           </div>
         </div>
       </div>
     </main>
   </div>
+
+  <script>
+    // ---------- Simple UI state ----------
+    let role = "student"; // default
+
+    const roleStudent = document.getElementById("roleStudent");
+    const roleCompany = document.getElementById("roleCompany");
+    const roleAdmin = document.getElementById("roleAdmin");
+
+    const registerCard = document.getElementById("registerCard");
+    const studentFields = document.getElementById("studentFields");
+    const companyFields = document.getElementById("companyFields");
+    const registerHint = document.getElementById("registerHint");
+
+    const msg = document.getElementById("msg");
+    const msgTitle = document.getElementById("msgTitle");
+    const msgText = document.getElementById("msgText");
+
+    function showMsg(title, text, ok=true) {
+      msg.style.display = "block";
+      msgTitle.textContent = ok ? "✅ " + title : "❌ " + title;
+      msgText.textContent = text || "";
+    }
+
+    function setRole(nextRole) {
+      role = nextRole;
+
+      // Visual selection (simple)
+      [roleStudent, roleCompany, roleAdmin].forEach(b => b.style.outline = "none");
+      if (role === "student") roleStudent.style.outline = "2px solid rgba(99,102,241,.8)";
+      if (role === "company") roleCompany.style.outline = "2px solid rgba(99,102,241,.8)";
+      if (role === "admin") roleAdmin.style.outline = "2px solid rgba(99,102,241,.8)";
+
+      // Register availability
+      if (role === "admin") {
+        registerCard.style.opacity = "0.6";
+        registerCard.style.pointerEvents = "none";
+        registerHint.textContent = "Admin accounts should be created by database/admin only.";
+      } else {
+        registerCard.style.opacity = "1";
+        registerCard.style.pointerEvents = "auto";
+        registerHint.textContent = "Register is available for Student/Company only.";
+      }
+
+      // Toggle fields
+      if (role === "student") {
+        studentFields.style.display = "grid";
+        companyFields.style.display = "none";
+        document.getElementById("reg_company_name").value = "";
+        document.getElementById("reg_first_name").required = true;
+        document.getElementById("reg_last_name").required = true;
+        document.getElementById("reg_company_name").required = false;
+      }
+
+      if (role === "company") {
+        studentFields.style.display = "none";
+        companyFields.style.display = "grid";
+        document.getElementById("reg_first_name").value = "";
+        document.getElementById("reg_last_name").value = "";
+        document.getElementById("reg_first_name").required = false;
+        document.getElementById("reg_last_name").required = false;
+        document.getElementById("reg_company_name").required = true;
+      }
+
+      if (role === "admin") {
+        studentFields.style.display = "grid"; // doesn't matter because register disabled
+        companyFields.style.display = "none";
+      }
+
+      msg.style.display = "none";
+    }
+
+    roleStudent.addEventListener("click", () => setRole("student"));
+    roleCompany.addEventListener("click", () => setRole("company"));
+    roleAdmin.addEventListener("click", () => setRole("admin"));
+
+    // default select
+    setRole("student");
+
+    // ---------- Login ----------
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("login_email").value.trim().toLowerCase();
+      const password = document.getElementById("login_password").value;
+
+      try {
+        const res = await fetch(`/api/auth/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ role, email, password })
+        });
+
+        const out = await res.json();
+
+        if (!res.ok || !out.ok) {
+          showMsg("Login failed", out.error || "Invalid credentials", false);
+          return;
+        }
+
+        showMsg("Login successful", `Welcome, ${out.user?.name || out.user?.email}!`);
+
+        // Redirect by role
+        if (role === "student") window.location.href = "student/student_dashboard.html";
+        if (role === "company") window.location.href = "company_dashboard.html";
+        if (role === "admin") window.location.href = "admin_dashboard.html";
+
+      } catch (err) {
+        showMsg("Server error", "Cannot reach backend", false);
+        console.error(err);
+      }
+    });
+
+    // ---------- Register (Student/Company) ----------
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      if (role === "admin") return;
+
+      const email = document.getElementById("reg_email").value.trim().toLowerCase();
+      const password = document.getElementById("reg_password").value;
+
+      const payload = { role, email, password };
+
+      if (role === "student") {
+        payload.first_name = document.getElementById("reg_first_name").value.trim();
+        payload.last_name = document.getElementById("reg_last_name").value.trim();
+      } else if (role === "company") {
+        payload.company_name = document.getElementById("reg_company_name").value.trim();
+      }
+
+      try {
+        const res = await fetch(`/api/auth/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const out = await res.json();
+
+        if (!res.ok || !out.ok) {
+          showMsg("Register failed", out.error || "Could not create account", false);
+          return;
+        }
+
+        showMsg("Account created", "You can now login with your email/password.");
+        // Optional: auto-fill login email
+        document.getElementById("login_email").value = email;
+        document.getElementById("login_password").value = password;
+      } catch (err) {
+        showMsg("Server error", "Cannot reach backend", false);
+        console.error(err);
+      }
+    });
+  </script>
 </body>
 </html>
