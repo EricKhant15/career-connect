@@ -36,136 +36,104 @@
     <div class="topbar">
       <div>
         <h2>Application</h2>
-        <p>Job: Software Developer Intern • Location: Bangna • Type: Part-time</p>
       </div>
       <a class="btn btn-ghost" href="company_applicant_profile.html">Back</a>
     </div>
 
-    <div class="section">
-      <!-- Applicant summary -->
-      <div class="card" style="margin-bottom:12px;">
-        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <div style="display:flex; gap:12px; align-items:center;">
-            <div class="avatar" style="width:54px;height:54px;">E</div>
-            <div>
-              <b style="display:block; font-size:16px;">Eric (#12345)</b>
-              <small>Computer Science • Assumption University (AU)</small><br/>
-              <small style="color:var(--muted);">GPA: 3.42 • Year: 3 • Available: Jun–Aug 2026</small>
-            </div>
-          </div>
+    
 
-          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <span class="chip">Status: Under Review</span>
-            <span class="chip">Applied: 02/07/2025</span>
-            <span class="chip">Source: CareerConnect</span>
-          </div>
-        </div>
-      </div>
+  <!-- Student basic info -->
+  <div class="card" style="margin-bottom:12px;">
+    <h3 id="studentName">Student Name</h3>
+    <p id="studentEmail" style="color:var(--muted);">student@email.com</p>
+  </div>
 
-      <!-- Essay blocks -->
-      <div class="grid">
-        <div class="card" style="grid-column: span 12;">
-          <h3>Essay 1 — Why do you want this internship?</h3>
-          <p style="margin-top:10px; line-height:1.8;">
-            I want to join this Software Developer Intern role because it matches my goal of building real systems that people use.
-            In my university projects, I have worked with Python and SQL to create applications such as an internship portal prototype
-            (CareerConnect) and a small data dashboard for survey analysis. I want to improve my skills in writing clean code, working with
-            version control, and collaborating in a professional environment.
-            <br/><br/>
-            I am especially interested in learning how a large company designs software for reliability and scale. I believe this internship will
-            help me understand development workflows (requirements, implementation, testing, and deployment) and how teams communicate
-            effectively through tasks and documentation. I’m confident I can contribute with strong problem-solving, fast learning, and consistent work.
-          </p>
-        </div>
+  <!-- Motivational Essay -->
+  <div class="card" style="margin-bottom:12px;">
+    <h3>Motivational Essay</h3>
+    <p id="motivationText" style="margin-top:10px; line-height:1.8;">
+      Loading...
+    </p>
+  </div>
 
-        <div class="card" style="grid-column: span 12;">
-          <h3>Essay 2 — What skills make you a good fit?</h3>
-          <p style="margin-top:10px; line-height:1.8;">
-            I am comfortable with Python fundamentals (data structures, functions, basic OOP) and I can write SQL queries for filtering, joining,
-            and summarizing data. I also understand core web concepts (HTML/CSS/JS) and have experience turning a UI prototype into working pages
-            without a database.
-            <br/><br/>
-            I work well in teams and I’m used to working with deadlines and clear deliverables. When working on group tasks, I usually take ownership
-            of organizing work, keeping progress visible, and making sure outputs are consistent. I use Git for version control and I’m familiar with
-            creating simple documentation to explain features and decisions.
-          </p>
-        </div>
-      </div>
+  <!-- Resume -->
+  <div class="card">
+    <h3>Student Resume</h3>
+    <p id="resumeArea" style="margin-top:10px; color:var(--muted);">
+      No resume uploaded
+    </p>
+  </div>
 
-      <!-- Attachments / Documents -->
-      <div class="card" style="margin-top:12px;">
-        <h3>Submitted Documents</h3>
-        <table class="table" style="margin-top:10px;">
-          <thead>
-            <tr>
-              <th>Document</th>
-              <th>Status</th>
-              <th>Last Updated</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Resume</td>
-              <td><span class="status good">Uploaded</span></td>
-              <td>01/07/2025</td>
-              <td><a class="btn" href="#" onclick="alert('Prototype: Open Resume PDF'); return false;">View</a></td>
-            </tr>
-            <tr>
-              <td>CV</td>
-              <td><span class="status good">Uploaded</span></td>
-              <td>01/07/2025</td>
-              <td><a class="btn" href="#" onclick="alert('Prototype: Open CV PDF'); return false;">View</a></td>
-            </tr>
-            <tr>
-              <td>Transcript</td>
-              <td><span class="status ok">Provided</span></td>
-              <td>30/06/2025</td>
-              <td><a class="btn" href="#" onclick="alert('Prototype: Open Transcript'); return false;">View</a></td>
-            </tr>
-            <tr>
-              <td>Portfolio Link</td>
-              <td><span class="status ok">Provided</span></td>
-              <td>02/07/2025</td>
-              <td><a class="btn" href="#" onclick="alert('Prototype: Open GitHub/Portfolio Link'); return false;">Open</a></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+</div>
 
-      <!-- Notes -->
-      <div class="card" style="margin-top:12px;">
-        <h3>Recruiter Notes (Internal)</h3>
-        <p style="margin-top:10px; color:var(--muted); line-height:1.8;">
-          • Strong match on Python/SQL basics. <br/>
-          • Has web prototype experience, good for internal tooling tasks. <br/>
-          • Portfolio looks consistent; check depth of projects in interview. <br/>
-          • Ask about teamwork experience and handling deadlines.
-        </p>
-      </div>
-
-      <!-- Actions -->
-      <div style="margin-top:16px; display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
-        <a class="btn btn-ghost" href="#" onclick="setDecision('Rejected'); return false;">Reject</a>
-        <a class="btn" href="#" onclick="sendMsg(); return false;">Send Message</a>
-        <a class="btn btn-primary" href="#" onclick="setDecision('Accepted'); return false;">Accept</a>
-      </div>
-
-      <p id="decisionText" style="margin-top:10px; color:var(--muted); text-align:right;"></p>
-    </div>
   </main>
 </div>
 
 <script>
-  function setDecision(d){
-    const el = document.getElementById("decisionText");
-    el.textContent = "Prototype action saved: " + d + " (status would update in DB later).";
-    alert("Prototype: " + d);
+  const companyId = Number(localStorage.getItem("company_id"));
+  if (!companyId) {
+    alert("Not logged in as company");
+    window.location.href = "login.html";
   }
-  function sendMsg(){
-    alert("Prototype: Message sent to applicant.");
+
+  // Read application id
+  const params = new URLSearchParams(window.location.search);
+  const applicationId = Number(params.get("app_id"));
+
+  if (!applicationId) {
+    alert("Invalid application");
+    window.location.href = "company_applicants.html";
   }
+
+  async function loadApplication() {
+    try {
+      const res = await fetch(
+        `/api/company/${companyId}/applications/${applicationId}`
+      );
+      const out = await res.json();
+
+      if (!res.ok || !out.ok) {
+        alert(out.error || "Failed to load application");
+        return;
+      }
+
+      render(out.application, out.documents || []);
+    } catch (err) {
+      console.error(err);
+      alert("Cannot reach backend");
+    }
+  }
+
+  function render(app, documents) {
+    // Student info
+    document.getElementById("studentName").textContent =
+      `${app.first_name} ${app.last_name}`;
+    document.getElementById("studentEmail").textContent =
+      app.student_email;
+
+    // Motivational essay (use description / essay field)
+    document.getElementById("motivationText").textContent =
+      app.motivation_letter || app.essay || "No essay submitted";
+
+    // Resume only
+    const resume = documents.find(d => d.doc_type === "resume");
+    const resumeArea = document.getElementById("resumeArea");
+
+    if (!resume) {
+      resumeArea.textContent = "No resume uploaded";
+    } else {
+      resumeArea.innerHTML = `
+        <a class="btn" href="${resume.file_url}" target="_blank">
+          View Resume (PDF)
+        </a>
+      `;
+    }
+  }
+
+  loadApplication();
 </script>
+
+
 
 </body>
 </html>

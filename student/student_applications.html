@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Applications - CareerConnect</title>
   <link rel="stylesheet" href="../css/style.css" />
-
-  <!-- Make sure this file exists and contains toggleInternships() -->
   <script src="../js/sidebar.js" defer></script>
 </head>
 <body>
@@ -20,9 +18,9 @@
     </div>
 
     <div class="profile">
-      <div class="avatar">E</div>
+      <div class="avatar" id="avatarLetter">S</div>
       <div>
-        <b>Eric #12345</b>
+        <b id="studentNameLabel">Student</b>
         <small>Student Account</small>
       </div>
     </div>
@@ -31,16 +29,9 @@
     <nav class="nav">
       <a href="student_dashboard.html">Dashboard</a>
 
-      <!-- ✅ Internship dropdown stays on every page -->
       <a href="#" class="nav-toggle" onclick="toggleInternships(event)">
         Internships <span class="chevron">▾</span>
       </a>
-
-      <div class="sub" id="internshipSubmenu">
-        <a href="student_browse.html">Browse Internships</a>
-        <a href="student_recommended.html">Recommended Internships</a>
-        <a href="student_liked.html">Liked Internships</a>
-      </div>
 
       <a class="active" href="student_applications.html">Applications</a>
       <a href="student_documents.html">Documents</a>
@@ -53,57 +44,186 @@
   </aside>
 
   <main class="main">
-    <div class="topbar">
-      <div>
-        <h2>Applications</h2>
-        <p>Track your application status (pre-set data for demo).</p>
+
+    <!-- Search + count -->
+    <div class="card" style="grid-column: span 12; margin-top:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+        <div class="search" style="min-width:320px; flex:1;">
+          <span style="color:var(--muted);font-weight:800;">🔎</span>
+          <input id="q" placeholder="Search internship title, company, status..." />
+        </div>
+        <span class="chip" id="countChip">0 records</span>
       </div>
-      <a class="btn btn-primary" href="student_browse.html">Find More Internships</a>
     </div>
 
-    <div class="section">
-      <div class="sectionHeader">
+    <div class="section" style="margin-top:12px;">
+      <div class="sectionHeader" style="margin-bottom:10px;">
         <b>Application List</b>
-        <span class="chip">7 records</span>
+        <span class="chip" id="modeChip">Connected to DB</span>
       </div>
 
       <table class="table">
         <thead>
           <tr>
-            <th>#</th>
+            <th style="width:70px;">#</th>
             <th>Internship</th>
-            <th>Applied Date</th>
-            <th>Action</th>
-            <th>Status</th>
+            <th style="width:160px;">Applied Date</th>
+            <th style="width:120px; text-align:right;">Action</th>
+            <th style="width:170px;">Status</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>Software Engineer Intern (Google Thailand)</td>
-            <td>02/07/2025</td>
-            <td><a class="btn" href="student_apply.html">View</a></td>
-            <td><span class="status good">Submitted</span></td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>Marketing Intern (Shopee)</td>
-            <td>28/03/2025</td>
-            <td><a class="btn" href="student_apply.html">View</a></td>
-            <td><span class="status warn">Under Review</span></td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>Data Analyst Intern (SCG)</td>
-            <td>12/08/2025</td>
-            <td><a class="btn" href="student_apply.html">View</a></td>
-            <td><span class="status ok">Accepted</span></td>
-          </tr>
+        <tbody id="rows">
+          <tr><td colspan="5" style="color:var(--muted);">Loading...</td></tr>
         </tbody>
       </table>
     </div>
   </main>
 </div>
+
+<script>
+  // Must exist from your login system
+  const studentId = Number(localStorage.getItem("student_id"));
+  const studentName = localStorage.getItem("student_name") || "Student";
+
+  if (!studentId) {
+    alert("Student not logged in. Please login again.");
+    window.location.href = "../login.html";
+  }
+
+  // UI labels
+  document.getElementById("studentNameLabel").textContent = studentName;
+  document.getElementById("avatarLetter").textContent = (studentName || "S").trim().charAt(0).toUpperCase();
+
+  const rowsEl = document.getElementById("rows");
+  const countChip = document.getElementById("countChip");
+  const modeChip = document.getElementById("modeChip");
+  const qInput = document.getElementById("q");
+
+  let allApps = [];
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  // ✅ Match your enum values:
+  // Submitted, Shortlisted, Interview, Rejected, Offered, Accepted, Withdrawn
+  function statusClass(s){
+    if (s === "Accepted") return "ok";
+    if (s === "Rejected" || s === "Withdrawn") return "warn";
+    return "good"; // Submitted / Shortlisted / Interview / Offered
+  }
+
+  function formatDate(d){
+    if (!d) return "—";
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return "—";
+    const dd = String(dt.getDate()).padStart(2, "0");
+    const mm = String(dt.getMonth() + 1).padStart(2, "0");
+    const yy = dt.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  function buildTitle(a){
+    const post = a.post_title || "Internship";
+    const company = a.company_name || "Company";
+    return `${post} (${company})`;
+  }
+
+  function getViewHref(a){
+    return `student_apply.html?post_id=${encodeURIComponent(a.post_id)}`;
+  }
+
+  function matchesQuery(a, q){
+    if (!q) return true;
+    const title = buildTitle(a);
+    const status = a.application_status || "Submitted";
+    const hay = (title + " " + status).toLowerCase();
+    return hay.includes(q);
+  }
+
+  function render(){
+    const q = (qInput.value || "").toLowerCase().trim();
+    const list = allApps.filter(a => matchesQuery(a, q));
+
+    countChip.textContent = `${list.length} records`;
+
+    if (!list.length) {
+      rowsEl.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">No applications found.</td></tr>`;
+      return;
+    }
+
+    rowsEl.innerHTML = list.map((a, idx) => {
+      const title = buildTitle(a);
+      const status = a.application_status || "Submitted";
+      const applied = formatDate(a.applied_date);
+      const viewHref = getViewHref(a);
+
+      // ✅ Clean row + nicer button; row is clickable (except the button)
+      return `
+        <tr
+          onclick="window.location.href='${viewHref}'"
+          style="cursor:pointer;"
+          title="Open application"
+        >
+          <td>${idx + 1}</td>
+
+          <td>
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <b>${escapeHtml(title)}</b>
+              <small style="color:var(--muted);">Post ID: ${escapeHtml(a.post_id)}</small>
+            </div>
+          </td>
+
+          <td>${escapeHtml(applied)}</td>
+
+          <td style="text-align:right;">
+            <a class="btn btn-primary"
+               style="padding:8px 12px; border-radius:12px;"
+               href="${viewHref}"
+               onclick="event.stopPropagation();"
+            >View</a>
+          </td>
+
+          <td>
+            <span class="status ${statusClass(status)}">${escapeHtml(status)}</span>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  async function loadApplications(){
+    try {
+      const r = await fetch(`http://localhost:5050/api/student/${studentId}/applications`);
+      const out = await r.json();
+
+      if (!r.ok || !out.ok) {
+        modeChip.className = "status warn";
+        modeChip.textContent = "DB Error";
+        rowsEl.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">Failed: ${escapeHtml(out.error || "unknown error")}</td></tr>`;
+        return;
+      }
+
+      modeChip.className = "status ok";
+      modeChip.textContent = "Connected to DB";
+
+      allApps = Array.isArray(out.applications) ? out.applications : [];
+      render();
+
+    } catch (e) {
+      modeChip.className = "status warn";
+      modeChip.textContent = "Cannot reach backend";
+      rowsEl.innerHTML = `<tr><td colspan="5" style="color:var(--muted);">Cannot reach backend</td></tr>`;
+      console.error(e);
+    }
+  }
+
+  qInput.addEventListener("input", render);
+
+  loadApplications();
+</script>
 
 </body>
 </html>

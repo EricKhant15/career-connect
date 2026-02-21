@@ -20,36 +20,94 @@
     <div class="panel">
       <h2 style="margin:0 0 6px;">Create Internship Posting</h2>
       <p style="margin:0 0 16px; color:var(--muted);">
-        This form is for demonstration (no database submission yet).
+        This form submits to PostgreSQL.
       </p>
 
-      <div class="form">
-        <div>
-          <div class="label">Company Name</div>
-          <input class="input" placeholder="e.g., Shopee Thailand" />
-        </div>
-
+      <form id="postForm" class="form">
         <div>
           <div class="label">Job Title</div>
-          <input class="input" placeholder="e.g., Software Intern" />
+          <input id="title" class="input" placeholder="e.g., Software Intern" required />
         </div>
 
         <div>
-          <div class="label">Location</div>
-          <input class="input" placeholder="e.g., Bangkok" />
+          <div class="label">Work Mode</div>
+          <select id="work_mode" class="input" required>
+            <option value="">Select</option>
+            <option value="Onsite">Onsite</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="Remote">Remote</option>
+          </select>
+        </div>
+
+        <div>
+          <div class="label">Stipend (THB)</div>
+          <input id="stipend" type="number" class="input" placeholder="e.g., 8000" />
+        </div>
+
+        <div>
+          <div class="label">Openings</div>
+          <input id="openings" type="number" class="input" placeholder="e.g., 2" />
+        </div>
+
+        <div>
+          <div class="label">Deadline</div>
+          <input id="deadline" type="date" class="input" />
         </div>
 
         <div>
           <div class="label">Description</div>
-          <textarea class="textarea" placeholder="Responsibilities, requirements, etc."></textarea>
+          <textarea id="description" class="textarea" placeholder="Responsibilities, requirements, etc."></textarea>
         </div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn btn-primary" href="company_dashboard.html">Post (Prototype)</a>
+          <button class="btn btn-primary" type="submit">Post Job</button>
           <a class="btn btn-ghost" href="company_dashboard.html">Cancel</a>
         </div>
-      </div>
+      </form>
     </div>
   </div>
+
+  <script>
+    const companyId = Number(localStorage.getItem("company_id"));
+    if (!companyId) {
+      alert("Not logged in as company");
+      window.location.href = "login.html";
+    }
+
+    document.getElementById("postForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const data = {
+        company_id: companyId,
+        title: document.getElementById("title").value.trim(),
+        description: document.getElementById("description").value.trim(),
+        work_mode: document.getElementById("work_mode").value,
+        stipend: document.getElementById("stipend").value,
+        openings: document.getElementById("openings").value,
+        deadline: document.getElementById("deadline").value
+      };
+
+      try {
+        const r = await fetch("/api/company/internships", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const out = await r.json();
+
+        if (!r.ok || !out.ok) {
+          alert("❌ " + (out.error || "Failed to post"));
+          return;
+        }
+
+        alert("✅ Internship posted!");
+        window.location.href = "company_jobposts.html";
+      } catch (err) {
+        alert("❌ Server error (cannot reach backend)");
+        console.error(err);
+      }
+    });
+  </script>
 </body>
 </html>

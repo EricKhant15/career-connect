@@ -3,20 +3,35 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Applicant Profile - Company</title>
+  <title>Application - Company</title>
   <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .pageWrap { max-width: 1100px; }
+    .pillRow { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .mini { font-size: 13px; color: var(--muted); }
+    .split { display:grid; grid-template-columns: 1fr; gap: 14px; margin-top: 14px; }
+    @media (min-width: 980px){ .split { grid-template-columns: 1fr 1fr; } }
+    .cardHead { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+    .formRow { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:12px; }
+    .selectSmall { min-width: 220px; }
+    .mutedBox { color: var(--muted); line-height: 1.8; }
+  </style>
 </head>
 <body>
 
 <div class="app">
+  <!-- Sidebar (Company) -->
   <aside class="sidebar">
     <div class="brandRow">
       <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Company</div>
     </div>
 
     <div class="profile">
-      <div class="avatar">S</div>
-      <div><b>Samsung</b><small>Company Account</small></div>
+      <div class="avatar" id="companyAvatar">C</div>
+      <div>
+        <b id="companyLabel">Company</b>
+        <small>Company Account</small>
+      </div>
     </div>
 
     <div class="navTitle">Menu</div>
@@ -32,38 +47,201 @@
     </div>
   </aside>
 
+  <!-- Main -->
   <main class="main">
     <div class="topbar">
       <div>
-        <h2>View Applicant Profile</h2>
-        <p>Prototype preview: About + Skills + CV button.</p>
+        <h2 style="margin:0;">Application</h2>
+        <p class="mini" id="jobSubtitle">Loading…</p>
       </div>
       <a class="btn btn-ghost" href="company_applicants.html">Back</a>
     </div>
 
-    <div class="section" style="text-align:center;">
-      <div class="avatar" style="margin:0 auto 10px; width:64px;height:64px;">E</div>
-      <b style="display:block;">Eric #12345</b>
-      <small>Computer Science • AU</small>
-
-      <div class="grid" style="margin-top:16px;">
-        <div class="card" style="grid-column: span 12;">
-          <h3>About</h3>
-          <p style="margin-top:8px;">Interested in backend development and databases. Experienced with Python and SQL projects.</p>
+    <div class="section pageWrap">
+      <div class="cardHead">
+        <div>
+          <b id="studentTitle" style="font-size:18px;">—</b>
+          <div class="mini" id="studentMeta">—</div>
+          <div class="pillRow">
+            <span class="chip" id="pillStatus">Status: —</span>
+            <span class="chip" id="pillApplied">Applied: —</span>
+            <span class="chip" id="pillSource">Source: CareerConnect</span>
+          </div>
         </div>
-        <div class="card" style="grid-column: span 12;">
-          <h3>Experiences and Skills</h3>
-          <p style="margin-top:8px;">Python • SQL • Git • Teamwork • Communication</p>
+
+        <div class="formRow">
+          <select class="select selectSmall" id="statusSelect">
+            <option>Submitted</option>
+            <option>Shortlisted</option>
+            <option>Interview</option>
+            <option>Rejected</option>
+            <option>Offered</option>
+            <option>Accepted</option>
+            <option>Withdrawn</option>
+          </select>
+          <button class="btn btn-primary" id="saveBtn">Update Status</button>
+          <span class="chip" id="modePill">Connected</span>
         </div>
       </div>
 
-      <div style="margin-top:14px;">
-        <a class="btn btn-primary" href="company_application.html">View Application</a>
-        <a class="btn" href="#" onclick="alert('Prototype: Open CV'); return false;">View CV</a>
+      <div class="split">
+        <div class="card">
+          <h3 style="margin:0 0 8px;">Applicant Info</h3>
+          <div class="mutedBox" id="infoBox">Loading…</div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin:0 0 8px;">Job Info</h3>
+          <div class="mutedBox" id="jobBox">Loading…</div>
+        </div>
       </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3 style="margin:0 0 8px;">Essay 1 — Why do you want this internship?</h3>
+        <p class="mutedBox" id="essay1">
+          (Not collected yet in database. If you already have a column for this, tell me the column name and I’ll connect it.)
+        </p>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <h3 style="margin:0 0 8px;">Essay 2 — What skills make you a good fit?</h3>
+        <p class="mutedBox" id="essay2">
+          (Not collected yet in database. If you already have a column for this, tell me the column name and I’ll connect it.)
+        </p>
+      </div>
+
     </div>
   </main>
 </div>
+
+<script>
+  const companyId = Number(localStorage.getItem("company_id"));
+  const companyName = localStorage.getItem("company_name") || "Company";
+
+  if (!companyId) {
+    alert("Not logged in as company. Please login again.");
+    window.location.href = "login.html";
+  }
+
+  document.getElementById("companyLabel").textContent = companyName;
+  document.getElementById("companyAvatar").textContent = (companyName || "C").trim().charAt(0).toUpperCase();
+
+  const params = new URLSearchParams(window.location.search);
+  const applicationId = Number(params.get("application_id"));
+
+  if (!applicationId) {
+    alert("Missing application_id in URL.");
+    window.location.href = "company_applicants.html";
+  }
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  function fmtDate(d){
+    if (!d) return "—";
+    const dt = new Date(d);
+    if (isNaN(dt.getTime())) return "—";
+    const dd = String(dt.getDate()).padStart(2,"0");
+    const mm = String(dt.getMonth()+1).padStart(2,"0");
+    const yy = dt.getFullYear();
+    return `${dd}/${mm}/${yy}`;
+  }
+
+  async function loadDetail(){
+    const modePill = document.getElementById("modePill");
+    try {
+      const r = await fetch(`http://localhost:5050/api/company/${companyId}/applications/${applicationId}`);
+      const out = await r.json();
+
+      if (!r.ok || !out.ok) {
+        modePill.textContent = "DB Error";
+        modePill.className = "chip";
+        alert(out.error || "Failed to load application");
+        return;
+      }
+
+      const a = out.application;
+
+      const studentFull = `${a.first_name || ""} ${a.last_name || ""}`.trim() || "Student";
+      document.getElementById("studentTitle").textContent = `${studentFull} (#${a.student_id})`;
+      document.getElementById("studentMeta").textContent = a.student_email || "—";
+
+      document.getElementById("jobSubtitle").textContent =
+        `Job: ${a.post_title || "—"} • Mode: ${a.work_mode || "—"} • Stipend: ${a.stipend ?? "—"}`;
+
+      document.getElementById("pillStatus").textContent = `Status: ${a.application_status || "—"}`;
+      document.getElementById("pillApplied").textContent = `Applied: ${fmtDate(a.applied_date)}`;
+
+      // set dropdown
+      document.getElementById("statusSelect").value = a.application_status || "Submitted";
+
+      document.getElementById("infoBox").innerHTML = `
+        <b>Student ID:</b> ${escapeHtml(a.student_id)}<br/>
+        <b>Name:</b> ${escapeHtml(studentFull)}<br/>
+        <b>Email:</b> ${escapeHtml(a.student_email || "—")}<br/>
+        <b>Application ID:</b> ${escapeHtml(a.application_id)}<br/>
+      `;
+
+      document.getElementById("jobBox").innerHTML = `
+        <b>Post ID:</b> ${escapeHtml(a.post_id)}<br/>
+        <b>Title:</b> ${escapeHtml(a.post_title || "—")}<br/>
+        <b>Work mode:</b> ${escapeHtml(a.work_mode || "—")}<br/>
+        <b>Openings:</b> ${escapeHtml(a.openings ?? "—")}<br/>
+        <b>Deadline:</b> ${escapeHtml(fmtDate(a.deadline))}<br/>
+      `;
+
+      modePill.textContent = "Connected";
+      modePill.className = "chip";
+    } catch (e) {
+      console.error(e);
+      const modePill = document.getElementById("modePill");
+      modePill.textContent = "Cannot reach backend";
+      modePill.className = "chip";
+    }
+  }
+
+  async function saveStatus(){
+    const newStatus = document.getElementById("statusSelect").value;
+    const modePill = document.getElementById("modePill");
+    const btn = document.getElementById("saveBtn");
+
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+
+    try {
+      const r = await fetch(`http://localhost:5050/api/applications/${applicationId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const out = await r.json();
+
+      if (!r.ok || !out.ok) {
+        modePill.textContent = "DB Error";
+        alert(out.error || "Failed to update status");
+        return;
+      }
+
+      modePill.textContent = "Saved";
+      document.getElementById("pillStatus").textContent = `Status: ${newStatus}`;
+      alert("✅ Status updated to " + newStatus);
+    } catch (e) {
+      console.error(e);
+      modePill.textContent = "Cannot reach backend";
+      alert("Cannot reach backend");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Update Status";
+    }
+  }
+
+  document.getElementById("saveBtn").addEventListener("click", saveStatus);
+
+  loadDetail();
+</script>
 
 </body>
 </html>

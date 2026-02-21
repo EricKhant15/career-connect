@@ -12,12 +12,17 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brandRow">
-      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Company</div>
+      <div class="logo"></div>
+      <div class="brandText">CareerConnect</div>
+      <div class="pill">Company</div>
     </div>
 
     <div class="profile">
-      <div class="avatar">S</div>
-      <div><b>Samsung</b><small>Company Account</small></div>
+      <div class="avatar" id="avatarLetter">C</div>
+      <div>
+        <b id="companyLabel">Company</b>
+        <small>Company Account</small>
+      </div>
     </div>
 
     <div class="navTitle">Menu</div>
@@ -36,41 +41,83 @@
 
   <!-- Main -->
   <main class="main">
+
+    <!-- Topbar (same height as student) -->
     <div class="topbar">
-      <div>
-        <h2>Company Dashboard</h2>
-        <p>Manage job posts, applicants, and interview scheduling (prototype).</p>
-      </div>
-      <a class="btn btn-ghost" href="login.html">Switch Role</a>
+      <div></div>
+      <div class="actions"></div>
     </div>
 
-    <div class="grid">
+    <!-- Hero Card (FULL WIDTH like student dashboard) -->
+    <div class="card" style="grid-column: span 12;">
+      <div class="cardTitle">
+        <div>
+          <h2 id="helloTitle">Hello</h2>
+          <p>Here is an overview of your internship activity.</p>
+        </div>
+        <span class="status ok" id="modePill">Connected to DB</span>
+      </div>
+
+      <!-- ✅ KPI ROW (same layout as student) -->
+      <div class="metric">
+        <div class="kpi">
+          <b id="kpiJobs">0</b>
+          <small>Active Job Posts</small>
+        </div>
+
+        <div class="kpi">
+          <b id="kpiApplicants">0</b>
+          <small>Total Applicants</small>
+        </div>
+
+        <div class="kpi">
+          <b id="kpiInterviews">0</b>
+          <small>Interviews Scheduled</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Cards (same size as student dashboard) -->
+    <div class="grid" style="margin-top:14px;">
       <div class="card">
-        <h3>Job Posts</h3>
-        <p>Create and manage internship postings.</p>
+        <h3>Manage Job Posts</h3>
+        <p>Create, review, and manage internship postings.</p>
         <div style="margin-top:12px;">
           <a class="btn btn-primary" href="company_jobposts.html">Open</a>
         </div>
       </div>
 
       <div class="card">
-        <h3>Applicants</h3>
-        <p>View applicants and statuses.</p>
+        <h3>View Applicants</h3>
+        <p>Review applications and update statuses.</p>
         <div style="margin-top:12px;">
           <a class="btn" href="company_applicants.html">Open</a>
         </div>
       </div>
-
-      <div class="card">
-        <h3>Interview</h3>
-        <p>Schedule interview date, time slot, and link.</p>
-        <div style="margin-top:12px;">
-          <a class="btn" href="company_interview.html">Open</a>
-        </div>
-      </div>
     </div>
+
   </main>
 </div>
+
+<script>
+  const companyId = Number(localStorage.getItem("company_id"));
+  const companyName = localStorage.getItem("company_name") || "Company";
+
+  if (!companyId) {
+    alert("Company not logged in. Please login again.");
+    window.location.href = "login.html";
+  }
+
+  document.getElementById("companyLabel").textContent = companyName;
+  document.getElementById("avatarLetter").textContent =
+    (companyName || "C").trim().charAt(0).toUpperCase();
+  document.getElementById("helloTitle").textContent = "Hello, " + companyName;
+
+  // 🔹 Dummy numbers for now (safe for submission)
+  document.getElementById("kpiJobs").textContent = 6;
+  document.getElementById("kpiApplicants").textContent = 18;
+  document.getElementById("kpiInterviews").textContent = 4;
+</script>
 
 </body>
 </html>

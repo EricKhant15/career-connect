@@ -10,157 +10,41 @@
 
 <div class="app">
   <aside class="sidebar">
-  <div class="brandRow">
-    <div class="logo"></div>
-    <div class="brandText">CareerConnect</div>
-    <div class="pill">Student</div>
-  </div>
-
-  <div class="profile">
-    <div class="avatar">E</div>
-    <div>
-      <b>Eric #12345</b>
-      <small>Student Account</small>
+    <div class="brandRow">
+      <div class="logo"></div>
+      <div class="brandText">CareerConnect</div>
+      <div class="pill">Student</div>
     </div>
+
+<div class="profile">
+  <div class="avatar" id="avatar">?</div>
+  <div>
+    <b id="studentName">Student</b>
+    <small>Student Account</small>
   </div>
-
-  <div class="navTitle">Menu</div>
-  <nav class="nav">
-
-    <a href="student_dashboard.html">Dashboard</a>
-    <!-- 🔽 Internship toggle -->
-    <a href="#" class="nav-toggle" onclick="toggleInternships(event)">
-  Internships <span class="chevron">▾</span>
-</a>
-
-<div class="sub" id="internshipSubmenu">
-  <a href="student_browse.html">Browse Internships</a>
-  <a href="student_recommended.html">Recommended Internships</a>
-  <a href="student_liked.html">Liked Internships</a>
 </div>
 
 
-    <a href="student_applications.html">Applications</a>
-    <a href="student_documents.html">Documents</a>
-  </nav>
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="student_dashboard.html">Dashboard</a>
 
-  <div class="navFooter">
-    <a href="../login.html">Switch Role</a>
-    <a href="../index.html">Sign Out</a>
-  </div>
-</aside>
+      <a href="#" class="nav-toggle" onclick="toggleInternships(event)">
+        Internships <span class="chevron">▾</span>
+      </a>
 
+      <a href="student_applications.html">Applications</a>
+      <a href="student_documents.html">Documents</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="../login.html">Switch Role</a>
+      <a href="../index.html">Sign Out</a>
+    </div>
+  </aside>
 
   <!-- Main -->
-  <main class="main">
-    <div class="topbar">
-      <div class="search">
-        <span style="color:var(--muted);font-weight:800;">🔎</span>
-        <input id="q" placeholder="Search internships, companies, skills..." />
-      </div>
-      <div class="actions">
-        <a class="btn btn-ghost" href="student_dashboard.html">Back</a>
-        <a class="btn btn-primary" href="student_apply.html">Apply</a>
-      </div>
-    </div>
 
-    <!-- Filter panel -->
-    <div class="section">
-      <div class="sectionHeader">
-        <div>
-          <b>Browse Intern / Filter</b>
-        </div>
-        <a class="btn btn-ghost" href="#" onclick="clearFilters(); return false;">Clear filter</a>
-      </div>
-
-      <div class="grid" style="margin-top:10px;">
-        <!-- Location -->
-        <div class="card" style="grid-column: span 4;">
-          <h3 style="margin-bottom:10px;">Location</h3>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fLoc" value="Chatuchak" /> Chatuchak
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fLoc" value="Bangna" /> Bangna
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fLoc" value="Rama 9" /> Rama 9
-          </label>
-        </div>
-
-        <!-- Work Type -->
-        <div class="card" style="grid-column: span 4;">
-          <h3 style="margin-bottom:10px;">Work Type</h3>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fWork" value="Full-time" /> Full time
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fWork" value="Part-time" /> Part time
-          </label>
-        </div>
-
-        <!-- Category -->
-        <div class="card" style="grid-column: span 4;">
-          <h3 style="margin-bottom:10px;">Category / Field</h3>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fCat" value="IT" /> IT
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fCat" value="Business" /> Business
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fCat" value="Marketing" /> Marketing
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fCat" value="Design" /> Design
-          </label>
-        </div>
-
-        <!-- Mode -->
-        <div class="card" style="grid-column: span 4;">
-          <h3 style="margin-bottom:10px;">Mode</h3>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fMode" value="Hybrid" /> Hybrid
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fMode" value="On-site" /> On-site
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fMode" value="Remote" /> Remote
-          </label>
-        </div>
-
-        <!-- Duration -->
-        <div class="card" style="grid-column: span 4;">
-          <h3 style="margin-bottom:10px;">Duration</h3>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fDur" value="<3" /> &lt; 3 Months
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fDur" value="3-6" /> 3-6 Months
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fDur" value=">6" /> &gt; 6 Months
-          </label>
-        </div>
-
-        <!-- Allowance -->
-        <div class="card" style="grid-column: span 4;">
-          <h3 style="margin-bottom:10px;">Allowance</h3>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fAll" value="Not provided" /> Not provided
-          </label>
-          <label style="display:flex;gap:10px;align-items:center;margin:8px 0;color:var(--muted);">
-            <input type="checkbox" class="fAll" value="Provided" /> Provided
-          </label>
-        </div>
-      </div>
-
-      <div style="margin-top:14px; display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
-        <a class="btn btn-ghost" href="#" onclick="clearFilters(); return false;">Clear Filter</a>
-        <a class="btn btn-primary" href="#" onclick="applyFilters(); return false;">Apply</a>
-      </div>
-    </div>
 
     <!-- Result chips -->
     <div class="section" id="chipsBox" style="display:none;">
@@ -179,93 +63,58 @@
       </div>
 
       <div class="grid" id="cardsGrid" style="margin-top:10px;"></div>
-
-      <div class="pager">
-        <a class="pageBtn" href="#">← Prev</a>
-        <a class="pageBtn" href="#">1</a>
-        <a class="pageBtn" href="#">2</a>
-        <a class="pageBtn active" href="#">3</a>
-        <a class="pageBtn" href="#">4</a>
-        <a class="pageBtn" href="#">5</a>
-        <a class="pageBtn" href="#">Next →</a>
-      </div>
     </div>
-
   </main>
 </div>
 
 <script>
-  // Pre-put internships (prototype demo)
-  const internships = [
-    {
-      title: "Company 1 (Software Developer Intern)",
-      location: "Bangna",
-      duration: "<3",
-      allowance: "Provided",
-      mode: "On-site",
-      workType: "Part-time",
-      category: "IT",
-      skills: "Python, SQL, Git",
-      deadline: "Dec 10, 2025"
-    },
-    {
-      title: "Company 2 (UI/UX Design Intern)",
-      location: "Chatuchak",
-      duration: "3-6",
-      allowance: "Not provided",
-      mode: "Hybrid",
-      workType: "Part-time",
-      category: "Design",
-      skills: "Figma, UI, Communication",
-      deadline: "Nov 30, 2025"
-    },
-    {
-      title: "Company 3 (Marketing Intern)",
-      location: "Rama 9",
-      duration: "<3",
-      allowance: "Provided",
-      mode: "On-site",
-      workType: "Full-time",
-      category: "Marketing",
-      skills: "Canva, Excel, Social Media",
-      deadline: "Oct 20, 2025"
-    }
-  ];
+  // ✅ Replace prototype list with DB data
+  let internships = [];
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  function formatDate(v){
+    if(!v) return "-";
+    try {
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return String(v);
+      return d.toLocaleDateString();
+    } catch { return String(v); }
+  }
 
   function cardHTML(x){
+    const title = `${x.company_name} (${x.title})`;
+    const stipend = (x.stipend == null || x.stipend === "") ? "Not provided" : "Provided";
     return `
       <div class="card" style="grid-column: span 4;">
         <div class="cardTitle">
           <div>
-            <h3>${x.title}</h3>
-            <p>${x.location}</p>
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(x.work_mode || "-")}</p>
           </div>
-          <span class="status good">Open</span>
+          <span class="status good">Active</span>
         </div>
 
         <div style="margin-top:12px; color:var(--muted); font-size:14px; line-height:1.9;">
-          <b style="color:var(--text);">Location :</b> ${x.location}<br/>
-          <b style="color:var(--text);">Duration :</b> ${durLabel(x.duration)}<br/>
-          <b style="color:var(--text);">Allowance :</b> ${x.allowance}<br/>
-          <b style="color:var(--text);">Mode :</b> ${x.mode}<br/>
-          <b style="color:var(--text);">Work Type :</b> ${x.workType}<br/>
-          <b style="color:var(--text);">Category :</b> ${x.category}<br/>
-          <b style="color:var(--text);">Skills :</b> ${x.skills}<br/>
-          <b style="color:var(--text);">Deadline :</b> ${x.deadline}
+          <b style="color:var(--text);">Company :</b> ${escapeHtml(x.company_name)}<br/>
+          <b style="color:var(--text);">Mode :</b> ${escapeHtml(x.work_mode || "-")}<br/>
+          <b style="color:var(--text);">Allowance :</b> ${escapeHtml(stipend)}<br/>
+          <b style="color:var(--text);">Stipend :</b> ${escapeHtml(String(x.stipend ?? 0))}<br/>
+          <b style="color:var(--text);">Openings :</b> ${escapeHtml(String(x.openings ?? "-"))}<br/>
+          <b style="color:var(--text);">Deadline :</b> ${escapeHtml(formatDate(x.deadline))}<br/>
+          <b style="color:var(--text);">Post ID :</b> ${escapeHtml(String(x.post_id))}
         </div>
 
         <div style="margin-top:14px;">
-          <a class="btn btn-primary" href="student_apply.html">Apply</a>
-          <a class="btn" href="student_apply.html" style="margin-left:8px;">View</a>
+          <a class="btn btn-primary" href="#" onclick="goApply(${x.post_id}); return false;">Apply</a>
+          <a class="btn" href="#" onclick="goApply(${x.post_id}); return false;" style="margin-left:8px;">View</a>
         </div>
       </div>
     `;
-  }
-
-  function durLabel(v){
-    if(v === "<3") return "< 3 Months";
-    if(v === "3-6") return "3-6 Months";
-    return "> 6 Months";
   }
 
   function getCheckedValues(cls){
@@ -275,31 +124,28 @@
   function applyFilters(){
     const q = (document.getElementById("q").value || "").toLowerCase();
 
-    const loc = getCheckedValues(".fLoc");
-    const work = getCheckedValues(".fWork");
-    const cat = getCheckedValues(".fCat");
     const mode = getCheckedValues(".fMode");
-    const dur  = getCheckedValues(".fDur");
     const all  = getCheckedValues(".fAll");
 
     let filtered = internships.filter(x => {
-      // Search
-      const hay = (x.title + " " + x.skills + " " + x.category + " " + x.location).toLowerCase();
+      const hay = (x.title + " " + x.company_name + " " + x.description).toLowerCase();
       if(q && !hay.includes(q)) return false;
 
-      // Checkboxes: if none selected -> ignore that filter
-      if(loc.length && !loc.includes(x.location)) return false;
-      if(work.length && !work.includes(x.workType)) return false;
-      if(cat.length && !cat.includes(x.category)) return false;
-      if(mode.length && !mode.includes(x.mode)) return false;
-      if(dur.length && !dur.includes(x.duration)) return false;
-      if(all.length && !all.includes(x.allowance)) return false;
+      // mode filter
+      if(mode.length && !mode.includes(x.work_mode)) return false;
+
+      // allowance filter: based on stipend null/0
+      if(all.length){
+        const hasAllowance = !(x.stipend == null || Number(x.stipend) === 0);
+        if(all.includes("Provided") && !hasAllowance) return false;
+        if(all.includes("Not provided") && hasAllowance) return false;
+      }
 
       return true;
     });
 
     render(filtered);
-    renderChips({q, loc, work, cat, mode, dur, all}, filtered.length);
+    renderChips({q, mode, all}, filtered.length);
   }
 
   function clearFilters(){
@@ -325,25 +171,56 @@
   function renderChips(filters, count){
     const chips = [];
     if(filters.q) chips.push("Search: " + filters.q);
-    filters.loc.forEach(v => chips.push("Location: " + v));
-    filters.work.forEach(v => chips.push("Work: " + v));
-    filters.cat.forEach(v => chips.push("Category: " + v));
-    filters.mode.forEach(v => chips.push("Mode: " + v));
-    filters.dur.forEach(v => chips.push("Duration: " + (v === "<3" ? "< 3 Months" : v === "3-6" ? "3-6 Months" : "> 6 Months")));
-    filters.all.forEach(v => chips.push("Allowance: " + v));
+    (filters.mode || []).forEach(v => chips.push("Mode: " + v));
+    (filters.all || []).forEach(v => chips.push("Allowance: " + v));
 
     const box = document.getElementById("chipsBox");
     const wrap = document.getElementById("chips");
-    wrap.innerHTML = chips.map(t => `<span class="chip">${t}</span>`).join("");
+    wrap.innerHTML = chips.map(t => `<span class="chip">${escapeHtml(t)}</span>`).join("");
 
     box.style.display = chips.length ? "block" : "none";
     document.getElementById("countChip").textContent = count + " results";
   }
 
-  // initial render
-  render(internships);
+  async function loadInternships(){
+    try {
+      const r = await fetch("/api/internships");
+      const out = await r.json();
+      if(!r.ok || !out.ok) {
+        alert("Failed to load internships: " + (out.error || "unknown error"));
+        return;
+      }
+      internships = out.posts || [];
+      render(internships);
+    } catch (e) {
+      alert("Cannot reach backend");
+      console.error(e);
+    }
+  }
+
+  function goApply(postId){
+    // store selected post_id so apply page knows what to submit
+    localStorage.setItem("selected_post_id", String(postId));
+    window.location.href = "student_apply.html";
+  }
+
+  // initial
+  loadInternships();
 </script>
+
 <script src="../js/sidebar.js"></script>
+
+<script>
+  const student = JSON.parse(localStorage.getItem("student"));
+
+  if(student){
+    document.getElementById("studentName").textContent =
+      student.full_name || student.name || "Student";
+
+    document.getElementById("avatar").textContent =
+      (student.full_name || student.name || "S")[0].toUpperCase();
+  }
+</script>
 
 </body>
 </html>

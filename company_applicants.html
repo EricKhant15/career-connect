@@ -15,8 +15,8 @@
     </div>
 
     <div class="profile">
-      <div class="avatar">S</div>
-      <div><b>Samsung</b><small>Company Account</small></div>
+      <div class="avatar">C</div>
+      <div><b>Company</b><small>Company Account</small></div>
     </div>
 
     <div class="navTitle">Menu</div>
@@ -34,56 +34,176 @@
 
   <main class="main">
     <div class="topbar">
-      <div>
+      
         <h2>Applicants</h2>
-        <p>Applicant listing for Job Posting 1 (prototype data).</p>
+      
+    </div>
+
+    <!-- simple search -->
+    <div class="section" style="margin-top:10px;">
+      <div class="card" style="display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap;">
+        <div style="display:flex; gap:10px; align-items:center; min-width:280px; flex:1;">
+          <span style="color:var(--muted); font-weight:800;">🔎</span>
+          <input id="q" placeholder="Search student name, email, job title..." style="width:100%;" />
+        </div>
+        <span class="chip" id="countChip">0 applicants</span>
       </div>
-      <a class="btn btn-ghost" href="company_jobposts.html">Back</a>
     </div>
 
     <div class="section">
       <table class="table">
         <thead>
           <tr>
-            <th>ID</th>
+            <th>App ID</th>
             <th>Student Name</th>
-            <th>Degree/Major</th>
+            <th>Email</th>
             <th>Job</th>
             <th>Status</th>
-            <th>Application</th>
+            <th style="text-align:right;">Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>#12345</td>
-            <td>Eric</td>
-            <td>Computer Science</td>
-            <td>Software Dev Intern</td>
-            <td><span class="status ok">Accepted</span></td>
-            <td><a class="btn" href="company_applicant_profile.html">View</a></td>
-          </tr>
-          <tr>
-            <td>#13A5B</td>
-            <td>Ronald</td>
-            <td>Business</td>
-            <td>Marketing Coordinator</td>
-            <td><span class="status good">Under Review</span></td>
-            <td><a class="btn" href="company_applicant_profile.html">View</a></td>
-          </tr>
-          <tr>
-            <td>#A0024A</td>
-            <td>Jerome</td>
-            <td>Music</td>
-            <td>Media Assistant</td>
-            <td><span class="status warn">Rejected</span></td>
-            <td><a class="btn" href="company_applicant_profile.html">View</a></td>
-          </tr>
+        <tbody id="rows">
+          <tr><td colspan="6" style="color:var(--muted);">Loading...</td></tr>
         </tbody>
       </table>
     </div>
 
   </main>
 </div>
+
+<script>
+  const companyId = Number(localStorage.getItem("company_id"));
+  if (!companyId) {
+    alert("Not logged in as company");
+    window.location.href = "login.html";
+  }
+
+  let applicants = [];
+
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  function statusClass(s){
+    // map to your existing CSS classes: ok/good/warn
+    if (s === "Accepted") return "ok";
+    if (s === "Rejected") return "warn";
+    if (s === "Under Review" || s === "Shortlisted" || s === "Offered") return "good";
+    return "good"; // Submitted, etc.
+  }
+
+  async function loadApplicants(){
+    try {
+      const r = await fetch(`/api/company/${companyId}/applicants`);
+      const out = await r.json();
+      if (!r.ok || !out.ok) {
+        document.getElementById("rows").innerHTML =
+          `<tr><td colspan="6" style="color:var(--muted);">Failed to load: ${escapeHtml(out.error || "unknown error")}</td></tr>`;
+        return;
+      }
+      applicants = out.applicants || [];
+      render();
+    } catch (e) {
+      document.getElementById("rows").innerHTML =
+        `<tr><td colspan="6" style="color:var(--muted);">Cannot reach backend</td></tr>`;
+      console.error(e);
+    }
+  }
+
+  function filtered(){
+    const q = (document.getElementById("q").value || "").toLowerCase().trim();
+    if (!q) return applicants;
+    return applicants.filter(a => {
+      const hay = (
+        (a.first_name || "") + " " +
+        (a.last_name || "") + " " +
+        (a.student_email || "") + " " +
+        (a.post_title || "") + " " +
+        (a.application_id || "")
+      ).toLowerCase();
+      return hay.includes(q);
+    });
+  }
+
+  function render(){
+    const list = filtered();
+    document.getElementById("countChip").textContent = list.length + " applicants";
+
+    const body = document.getElementById("rows");
+    if (!list.length) {
+      body.innerHTML = `<tr><td colspan="6" style="color:var(--muted);">No applicants yet.</td></tr>`;
+      return;
+    }
+
+    body.innerHTML = list.map(a => {
+      const name = `${a.first_name || ""} ${a.last_name || ""}`.trim() || "—";
+      const status = a.application_status || "Submitted";
+
+      // ✅ View button link (goes to your application detail page)
+      const viewHref = `company_application.html?app_id=${encodeURIComponent(a.application_id)}`;
+
+      return `
+        <tr>
+          <td>#${escapeHtml(a.application_id)}</td>
+          <td>${escapeHtml(name)}</td>
+          <td>${escapeHtml(a.student_email || "-")}</td>
+          <td>${escapeHtml(a.post_title || "-")}</td>
+          <td>
+            <span class="status ${statusClass(status)}">${escapeHtml(status)}</span>
+          </td>
+          <td style="text-align:right;">
+            <div style="display:flex; justify-content:flex-end; gap:10px; align-items:center; flex-wrap:wrap;">
+              <a class="btn" href="${viewHref}">View</a>
+
+              <select onchange="updateStatus(${a.application_id}, this.value)" class="input" style="max-width:190px;">
+                ${renderStatusOptions(status)}
+              </select>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function renderStatusOptions(current){
+    // IMPORTANT: must match your Postgres enum values exactly
+    const options = ["Submitted","Shortlisted","Interview","Rejected","Offered","Accepted","Withdrawn"];
+    return options.map(s => {
+      const sel = (s === current) ? "selected" : "";
+      return `<option value="${escapeHtml(s)}" ${sel}>${escapeHtml(s)}</option>`;
+    }).join("");
+  }
+
+  async function updateStatus(applicationId, status){
+    try {
+      const r = await fetch(`/api/applications/${applicationId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status })
+      });
+      const out = await r.json();
+      if (!r.ok || !out.ok) {
+        alert("Update failed: " + (out.error || "unknown error"));
+        await loadApplicants();
+        return;
+      }
+      // update locally so UI feels instant
+      const idx = applicants.findIndex(x => Number(x.application_id) === Number(applicationId));
+      if (idx >= 0) applicants[idx].application_status = status;
+      render();
+    } catch (e) {
+      alert("Cannot reach backend");
+      console.error(e);
+      await loadApplicants();
+    }
+  }
+
+  document.getElementById("q").addEventListener("input", render);
+
+  loadApplicants();
+</script>
 
 </body>
 </html>

@@ -9,44 +9,38 @@
 <body>
 
   <div class="app">
-<!-- Sidebar (STUDENT) -->
-<aside class="sidebar">
-  <div class="brandRow">
-    <div class="logo"></div>
-    <div class="brandText">CareerConnect</div>
-    <div class="pill">Student</div>
-  </div>
+    <!-- Sidebar (STUDENT) -->
+    <aside class="sidebar">
+      <div class="brandRow">
+        <div class="logo"></div>
+        <div class="brandText">CareerConnect</div>
+        <div class="pill">Student</div>
+      </div>
 
-<a class="profile profileLink" href="student_profile.html" style="text-decoration:none;">
-  <div class="avatar" title="Open Profile">E</div>
-  <div>
-    <b>Eric #12345</b>
-    <small>Student Account</small>
-  </div>
-</a>
+      <a class="profile profileLink" href="student_profile.html" style="text-decoration:none;">
+        <div class="avatar" title="Open Profile" id="avatarLetter">S</div>
+        <div>
+          <b id="studentLabel">Student</b>
+          <small>Student Account</small>
+        </div>
+      </a>
 
+      <div class="navTitle">Menu</div>
+      <nav class="nav">
+        <a class="active" href="student_dashboard.html">Dashboard</a>
 
-  <div class="navTitle">Menu</div>
-  <nav class="nav">
-    <a href="student_dashboard.html">Dashboard</a>
+        <a href="student_browse.html">Internships</a>
+      
 
-    <a href="student_browse.html">Internships</a>
-    <div class="sub">
-      <a href="student_browse.html">Browse Internships</a>
-      <a href="student_recommended.html">Recommended Internships</a>
-      <a href="student_liked.html">Liked Internships</a>
-    </div>
+        <a href="student_applications.html">Applications</a>
+        <a href="student_documents.html">Documents</a>
+      </nav>
 
-    <a href="student_applications.html">Applications</a>
-    <a href="student_documents.html">Documents</a>
-  </nav>
-
-  <div class="navFooter">
-    <a href="../login.html">Switch Role</a>
-    <a href="../index.html">Sign Out</a>
-  </div>
-</aside>
-
+      <div class="navFooter">
+        <a href="../login.html">Switch Role</a>
+        <a href="../index.html">Sign Out</a>
+      </div>
+    </aside>
 
     <!-- Main -->
     <main class="main">
@@ -56,25 +50,23 @@
           <input placeholder="Search internships, companies, skills..." />
         </div>
         <div class="actions">
-          <a class="btn btn-ghost" href="student_browse.html">Browse</a>
-          <a class="btn btn-primary" href="student_apply.html">Apply</a>
         </div>
       </div>
 
       <div class="card" style="grid-column: span 12;">
         <div class="cardTitle">
           <div>
-            <h2>Hello, Eric</h2>
+            <h2 id="helloTitle">Hello</h2>
             <p>Here are your latest internship updates.</p>
           </div>
-          <span class="status good">Prototype Mode</span>
+          <span class="status ok" id="modePill">Connected to DB</span>
         </div>
 
+        <!-- ✅ KPI (3 only) -->
         <div class="metric">
-          <div class="kpi"><b>3</b><small>Applications Submitted</small></div>
-          <div class="kpi"><b>1</b><small>Under Review</small></div>
-          <div class="kpi"><b>1</b><small>Accepted / Offers</small></div>
-          <div class="kpi"><b>4</b><small>Saved Internships</small></div>
+          <div class="kpi"><b id="kpiSubmitted">0</b><small>Applications Submitted</small></div>
+          <div class="kpi"><b id="kpiOffers">0</b><small>Offers (Offered + Accepted)</small></div>
+          <div class="kpi"><b id="kpiRejected">0</b><small>Rejections</small></div>
         </div>
       </div>
 
@@ -86,6 +78,7 @@
             <a class="btn btn-primary" href="student_browse.html">Open</a>
           </div>
         </div>
+
         <div class="card">
           <h3>Manage Documents</h3>
           <p>Upload resume, transcript, and other documents.</p>
@@ -96,6 +89,49 @@
       </div>
     </main>
   </div>
+
+<script>
+  const studentId = Number(localStorage.getItem("student_id"));
+  const studentName = localStorage.getItem("student_name") || "Student";
+
+  if (!studentId) {
+    alert("Student not logged in. Please login again.");
+    window.location.href = "../login.html";
+  }
+
+  document.getElementById("studentLabel").textContent = studentName;
+  document.getElementById("avatarLetter").textContent = (studentName || "S").trim().charAt(0).toUpperCase();
+  document.getElementById("helloTitle").textContent = "Hello, " + studentName;
+
+  async function loadStats(){
+    try {
+      const r = await fetch(`http://localhost:5050/api/student/${studentId}/dashboard`);
+      const out = await r.json();
+
+      if (!r.ok || !out.ok) {
+        document.getElementById("modePill").className = "status warn";
+        document.getElementById("modePill").textContent = "DB Error";
+        console.error(out);
+        return;
+      }
+
+      const s = out.stats || {};
+      document.getElementById("kpiSubmitted").textContent = s.submitted ?? 0;
+      document.getElementById("kpiOffers").textContent = s.offers ?? 0;
+      document.getElementById("kpiRejected").textContent = s.rejected ?? 0;
+
+      document.getElementById("modePill").className = "status ok";
+      document.getElementById("modePill").textContent = "Connected to DB";
+
+    } catch (e) {
+      document.getElementById("modePill").className = "status warn";
+      document.getElementById("modePill").textContent = "Cannot reach backend";
+      console.error(e);
+    }
+  }
+
+  loadStats();
+</script>
 
 </body>
 </html>
