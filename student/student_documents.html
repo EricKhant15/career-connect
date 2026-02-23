@@ -71,6 +71,12 @@
       background: rgba(255,255,255,.04);
       display:block;
     }
+    .docLinkBox{
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 12px;
+      padding: 14px;
+    }
   </style>
 </head>
 <body>
@@ -82,8 +88,8 @@
     </div>
 
     <div class="profile">
-      <div class="avatar">E</div>
-      <div><b>Eric #12345</b><small>Student Account</small></div>
+      <div class="avatar">S</div>
+      <div><b>Student</b><small>Student Account</small></div>
     </div>
 
     <div class="navTitle">Menu</div>
@@ -95,8 +101,8 @@
     </nav>
 
     <div class="navFooter">
-      <a href="login.html">Switch Role</a>
-      <a href="index.html">Sign Out</a>
+      <a href="../login.html">Switch Role</a>
+      <a href="../index.html">Sign Out</a>
     </div>
   </aside>
 
@@ -104,7 +110,7 @@
     <div class="topbar">
       <div>
         <h2>Documents</h2>
-        <p>Manage your personal documents for internship applications.</p>
+        <p>Upload your Resume, Transcript, and Portfolio for internship applications.</p>
       </div>
     </div>
 
@@ -117,13 +123,11 @@
           <li class="item" data-doc="resume">
             <div>
               <b>Resume (CV)</b><br>
-              <small>Status: <span class="inlineStatus">Missing</span></small>
+              <small>Status: <span class="inlineStatus">Loading...</span></small>
             </div>
             <div class="right">
-              <span class="status warn">Missing</span>
-              <div class="actionsSlot">
-                <a class="btn btn-primary" href="#" onclick="uploadDoc('resume'); return false;">Upload</a>
-              </div>
+              <span class="status warn">...</span>
+              <div class="actionsSlot"></div>
             </div>
           </li>
 
@@ -131,47 +135,11 @@
           <li class="item" data-doc="transcript">
             <div>
               <b>Transcript</b><br>
-              <small>Status: <span class="inlineStatus">Missing</span></small>
+              <small>Status: <span class="inlineStatus">Loading...</span></small>
             </div>
             <div class="right">
-              <span class="status warn">Missing</span>
-              <div class="actionsSlot">
-                <a class="btn btn-primary" href="#" onclick="uploadDoc('transcript'); return false;">Upload</a>
-              </div>
-            </div>
-          </li>
-
-          <!-- Cover Letter -->
-          <li class="item" data-doc="coverLetter">
-            <div>
-              <b>Cover Letter</b><br>
-              <small>Status: <span class="inlineStatus">Missing</span></small>
-            </div>
-            <div class="right">
-              <span class="status warn">Missing</span>
-              <div class="actionsSlot">
-                <a class="btn btn-primary" href="#" onclick="uploadDoc('coverLetter'); return false;">Upload</a>
-              </div>
-            </div>
-          </li>
-        </ul>
-      </div>
-
-      <div class="card">
-        <h3>Other Documents</h3>
-
-        <ul class="list" style="margin-top:12px;">
-          <!-- Recommendation -->
-          <li class="item" data-doc="recommendation">
-            <div>
-              <b>Recommendation Letter</b><br>
-              <small>Status: <span class="inlineStatus">Missing</span></small>
-            </div>
-            <div class="right">
-              <span class="status warn">Missing</span>
-              <div class="actionsSlot">
-                <a class="btn btn-primary" href="#" onclick="uploadDoc('recommendation'); return false;">Upload</a>
-              </div>
+              <span class="status warn">...</span>
+              <div class="actionsSlot"></div>
             </div>
           </li>
 
@@ -179,18 +147,15 @@
           <li class="item" data-doc="portfolio">
             <div>
               <b>Portfolio (PDF/Link)</b><br>
-              <small>Status: <span class="inlineStatus">Missing</span></small>
+              <small>Status: <span class="inlineStatus">Loading...</span></small>
             </div>
             <div class="right">
-              <span class="status warn">Missing</span>
-              <div class="actionsSlot">
-                <a class="btn btn-primary" href="#" onclick="uploadDoc('portfolio'); return false;">Upload</a>
-              </div>
+              <span class="status warn">...</span>
+              <div class="actionsSlot"></div>
             </div>
           </li>
         </ul>
       </div>
-
     </div>
   </main>
 </div>
@@ -207,7 +172,8 @@
         <div class="docMetaSmall" id="docMeta">File: -</div>
         <div style="display:flex; gap:8px; flex-wrap: wrap;">
           <button class="btn" id="removeBtn" onclick="removeDoc()">Remove</button>
-          <button class="btn btn-primary" id="replaceBtn" onclick="replaceDoc()">Replace</button>
+          <button class="btn" id="portfolioLinkBtn" onclick="setPortfolioLink()" style="display:none;">Set Link</button>
+          <button class="btn btn-primary" id="replaceBtn" onclick="replaceDoc()">Upload/Replace</button>
         </div>
       </div>
       <div id="docPreviewWrap"></div>
@@ -216,28 +182,78 @@
 </div>
 
 <script>
-  const STORE_KEY = "student_documents_v1";
+  // ====== Login (use your existing login.html storage key) ======
+  const studentId = localStorage.getItem("student_id"); // set in login.html :contentReference[oaicite:1]{index=1}
+  if (!studentId) {
+    alert("Please log in as a student first.");
+    window.location.href = "../login.html";
+  }
+
+  // ====== Map UI IDs -> DB ENUM values (Title Case) ======
+  const DOC_MAP = {
+    resume: "Resume",
+    transcript: "Transcript",
+    portfolio: "Portfolio"
+  };
+
   const titleMap = {
     resume: "Resume (CV)",
     transcript: "Transcript",
-    coverLetter: "Cover Letter",
-    recommendation: "Recommendation Letter",
     portfolio: "Portfolio"
   };
 
   let currentDocId = null;
+  let docsCache = {}; // backend result map: { Resume: {...}, Transcript: {...}, Portfolio: {...} }
 
-  function loadStore(){
-    try { return JSON.parse(localStorage.getItem(STORE_KEY) || "{}"); }
-    catch { return {}; }
+  // ====== API ======
+  async function apiGetDocs(){
+    const res = await fetch(`/api/student/${studentId}/documents`);
+    const out = await res.json();
+    if (!res.ok || !out.ok) {
+      throw new Error(out.error || "Failed to load documents");
+    }
+    // out.documents is expected as map keyed by doc_type
+    docsCache = out.documents || {};
   }
 
-  function saveStore(data){
-    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  async function apiUploadDoc(uiDocId, file){
+    const docType = DOC_MAP[uiDocId]; // Resume / Transcript / Portfolio
+    const fd = new FormData();
+    fd.append("file", file);
+
+    const res = await fetch(`/api/student/${studentId}/documents/${encodeURIComponent(docType)}/upload`, {
+      method: "POST",
+      body: fd
+    });
+    const out = await res.json();
+    if (!res.ok || !out.ok) throw new Error(out.error || "Upload failed");
+    return out;
   }
 
-  function setRowState(docId, exists){
-    const row = document.querySelector(`[data-doc="${docId}"]`);
+  async function apiDeleteDoc(uiDocId){
+    const docType = DOC_MAP[uiDocId];
+    const res = await fetch(`/api/student/${studentId}/documents/${encodeURIComponent(docType)}`, {
+      method: "DELETE"
+    });
+    const out = await res.json();
+    if (!res.ok || !out.ok) throw new Error(out.error || "Delete failed");
+    return out;
+  }
+
+  async function apiSetPortfolioLink(url){
+    const res = await fetch(`/api/student/${studentId}/documents/portfolio-link`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url })
+    });
+    const out = await res.json();
+    if (!res.ok || !out.ok) throw new Error(out.error || "Failed to save link");
+    return out;
+  }
+
+  // ====== UI Rendering ======
+  function setRowState(uiDocId, exists){
+    const row = document.querySelector(`[data-doc="${uiDocId}"]`);
     if(!row) return;
 
     const statusBadge = row.querySelector(".status");
@@ -248,91 +264,110 @@
       statusBadge.textContent = "Uploaded";
       statusBadge.classList.remove("warn");
       statusBadge.classList.add("ok");
-
       inlineStatus.textContent = "Uploaded";
 
       actionsSlot.innerHTML = `
-        <a class="btn" href="#" onclick="viewDoc('${docId}'); return false;">View</a>
+        <a class="btn" href="#" onclick="viewDoc('${uiDocId}'); return false;">View</a>
       `;
     } else {
       statusBadge.textContent = "Missing";
       statusBadge.classList.remove("ok");
       statusBadge.classList.add("warn");
-
       inlineStatus.textContent = "Missing";
 
       actionsSlot.innerHTML = `
-        <a class="btn btn-primary" href="#" onclick="uploadDoc('${docId}'); return false;">Upload</a>
+        <a class="btn btn-primary" href="#" onclick="uploadDoc('${uiDocId}'); return false;">Upload</a>
       `;
     }
   }
 
   function renderAll(){
-    const data = loadStore();
-    Object.keys(titleMap).forEach(id => {
-      setRowState(id, !!data[id]);
+    ["resume","transcript","portfolio"].forEach(uiId => {
+      const docType = DOC_MAP[uiId];
+      const d = docsCache[docType];
+      const exists = !!(d && (d.file_url || d.portfolio_link));
+      setRowState(uiId, exists);
     });
   }
 
-  function uploadDoc(docId){
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".pdf,.png,.jpg,.jpeg";
-    input.onchange = () => {
-      const file = input.files && input.files[0];
-      if(!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        const data = loadStore();
-        data[docId] = {
-          name: file.name,
-          type: file.type,
-          dataUrl: reader.result,
-          uploadedAt: new Date().toISOString()
-        };
-        saveStore(data);
-        renderAll();
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
+  // ====== Upload ======
+  function pickPdfFile(){
+    return new Promise((resolve) => {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = ".pdf,application/pdf";
+      input.onchange = () => resolve(input.files && input.files[0] ? input.files[0] : null);
+      input.click();
+    });
   }
 
-  function viewDoc(docId){
-    const data = loadStore();
-    const doc = data[docId];
+  async function uploadDoc(uiDocId){
+    try{
+      const file = await pickPdfFile();
+      if(!file) return;
 
-    currentDocId = docId;
+      await apiUploadDoc(uiDocId, file);
+      await apiGetDocs();
+      renderAll();
+    } catch(e){
+      alert(e.message || "Upload failed");
+    }
+  }
 
-    if(!doc){
-      // if missing, open modal with upload CTA
-      openDocModal(titleMap[docId] || "Document");
-      document.getElementById("docMeta").textContent = "No file uploaded.";
-      document.getElementById("docPreviewWrap").innerHTML = `
+  // ====== View ======
+  function viewDoc(uiDocId){
+    currentDocId = uiDocId;
+
+    const docType = DOC_MAP[uiDocId];
+    const d = docsCache[docType];
+
+    openDocModal(titleMap[uiDocId] || "Document");
+
+    const meta = document.getElementById("docMeta");
+    const wrap = document.getElementById("docPreviewWrap");
+    const removeBtn = document.getElementById("removeBtn");
+    const replaceBtn = document.getElementById("replaceBtn");
+    const linkBtn = document.getElementById("portfolioLinkBtn");
+
+    // Only show "Set Link" for portfolio
+    linkBtn.style.display = (uiDocId === "portfolio") ? "inline-block" : "none";
+    replaceBtn.textContent = (uiDocId === "portfolio") ? "Upload/Replace PDF" : "Upload/Replace";
+
+    if(!d || (!d.file_url && !d.portfolio_link)){
+      meta.textContent = "No file uploaded.";
+      removeBtn.style.display = "none";
+      wrap.innerHTML = `
         <p style="margin:0 0 12px 0;">You haven't uploaded this document yet.</p>
-        <button class="btn btn-primary" onclick="uploadDoc('${docId}')">Upload now</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="btn btn-primary" onclick="uploadDoc('${uiDocId}')">Upload PDF</button>
+          ${uiDocId === "portfolio" ? `<button class="btn" onclick="setPortfolioLink()">Set Portfolio Link</button>` : ``}
+        </div>
       `;
-      document.getElementById("removeBtn").style.display = "none";
-      document.getElementById("replaceBtn").style.display = "none";
       return;
     }
 
-    openDocModal(titleMap[docId] || "Document");
-    document.getElementById("docMeta").textContent = "File: " + (doc.name || "-");
-    document.getElementById("removeBtn").style.display = "inline-block";
-    document.getElementById("replaceBtn").style.display = "inline-block";
+    removeBtn.style.display = "inline-block";
 
-    const wrap = document.getElementById("docPreviewWrap");
-    const type = (doc.type || "").toLowerCase();
-
-    if(type.includes("pdf")){
-      wrap.innerHTML = `<iframe class="docPreview" src="${doc.dataUrl}"></iframe>`;
-    } else if(type.startsWith("image/")){
-      wrap.innerHTML = `<img class="docImgPreview" src="${doc.dataUrl}" alt="Document preview" />`;
-    } else {
-      wrap.innerHTML = `<p>Preview not supported for this file type.</p>`;
+    // Portfolio link-only view
+    if(uiDocId === "portfolio" && d.portfolio_link && !d.file_url){
+      meta.textContent = "Portfolio link saved";
+      wrap.innerHTML = `
+        <div class="docLinkBox">
+          <b>Portfolio Link</b>
+          <div style="margin-top:8px;">
+            <a class="btn btn-primary" href="${d.portfolio_link}" target="_blank" rel="noopener noreferrer">Open Link</a>
+            <div style="margin-top:8px; color: var(--muted); font-size: 13px; word-break: break-all;">
+              ${d.portfolio_link}
+            </div>
+          </div>
+        </div>
+      `;
+      return;
     }
+
+    // File preview (PDF)
+    meta.textContent = "File: " + (d.original_name || "-");
+    wrap.innerHTML = `<iframe class="docPreview" src="${d.file_url}"></iframe>`;
   }
 
   function openDocModal(title){
@@ -349,22 +384,52 @@
     if(e.target.id === "docModal") closeDocModal();
   });
 
-  function removeDoc(){
+  async function removeDoc(){
     if(!currentDocId) return;
-    const data = loadStore();
-    delete data[currentDocId];
-    saveStore(data);
-    closeDocModal();
-    renderAll();
+    if(!confirm("Remove this document?")) return;
+
+    try{
+      await apiDeleteDoc(currentDocId);
+      closeDocModal();
+      await apiGetDocs();
+      renderAll();
+    } catch(e){
+      alert(e.message || "Remove failed");
+    }
   }
 
-  function replaceDoc(){
+  async function replaceDoc(){
     if(!currentDocId) return;
-    uploadDoc(currentDocId);
+    await uploadDoc(currentDocId);
+    // refresh modal preview
+    viewDoc(currentDocId);
   }
 
-  // initial render
-  renderAll();
+  async function setPortfolioLink(){
+    const url = prompt("Paste your portfolio link (must start with https://):");
+    if(!url) return;
+
+    try{
+      await apiSetPortfolioLink(url.trim());
+      await apiGetDocs();
+      renderAll();
+      viewDoc("portfolio");
+    } catch(e){
+      alert(e.message || "Failed to save link");
+    }
+  }
+
+  // ====== Init ======
+  async function init(){
+    try{
+      await apiGetDocs();
+      renderAll();
+    } catch(e){
+      alert(e.message || "Failed to load documents");
+    }
+  }
+
+  init();
 </script>
 
 </body>

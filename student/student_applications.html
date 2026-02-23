@@ -28,11 +28,7 @@
     <div class="navTitle">Menu</div>
     <nav class="nav">
       <a href="student_dashboard.html">Dashboard</a>
-
-      <a href="#" class="nav-toggle" onclick="toggleInternships(event)">
-        Internships <span class="chevron">▾</span>
-      </a>
-
+      <a href="student_browse.html">Internships</a>
       <a class="active" href="student_applications.html">Applications</a>
       <a href="student_documents.html">Documents</a>
     </nav>
@@ -131,8 +127,10 @@
     return `${post} (${company})`;
   }
 
-  function getViewHref(a){
-    return `student_apply.html?post_id=${encodeURIComponent(a.post_id)}`;
+  // ✅ NEW: go to the job detail page (student_view.html)
+  function goViewPost(postId){
+    localStorage.setItem("selected_post_id", String(postId));
+    window.location.href = "student_view.html";
   }
 
   function matchesQuery(a, q){
@@ -158,14 +156,14 @@
       const title = buildTitle(a);
       const status = a.application_status || "Submitted";
       const applied = formatDate(a.applied_date);
-      const viewHref = getViewHref(a);
+      const pid = Number(a.post_id);
 
-      // ✅ Clean row + nicer button; row is clickable (except the button)
+      // ✅ Row click opens student_view.html
       return `
         <tr
-          onclick="window.location.href='${viewHref}'"
+          onclick="goViewPost(${pid})"
           style="cursor:pointer;"
-          title="Open application"
+          title="Open job details"
         >
           <td>${idx + 1}</td>
 
@@ -181,8 +179,8 @@
           <td style="text-align:right;">
             <a class="btn btn-primary"
                style="padding:8px 12px; border-radius:12px;"
-               href="${viewHref}"
-               onclick="event.stopPropagation();"
+               href="#"
+               onclick="event.stopPropagation(); goViewPost(${pid}); return false;"
             >View</a>
           </td>
 
@@ -221,7 +219,6 @@
   }
 
   qInput.addEventListener("input", render);
-
   loadApplications();
 </script>
 

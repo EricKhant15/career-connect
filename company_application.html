@@ -21,6 +21,7 @@
 
     <div class="navTitle">Menu</div>
     <nav class="nav">
+      <a href="company_dashboard.html">Dashboard</a>
       <a href="company_jobposts.html">Job Posts</a>
       <a href="company_interview.html">Interview</a>
       <a class="active" href="company_applicants.html">Applicants</a>
@@ -34,37 +35,41 @@
 
   <main class="main">
     <div class="topbar">
-      <div>
-        <h2>Application</h2>
-      </div>
-      <a class="btn btn-ghost" href="company_applicant_profile.html">Back</a>
+      <div><h2>Application</h2></div>
+      <a class="btn btn-ghost" href="company_applicants.html">Back</a>
     </div>
 
-    
+    <!-- Student basic info -->
+    <div class="card" style="margin-bottom:12px;">
+      <h3 id="studentName">Student Name</h3>
+      <p id="studentEmail" style="color:var(--muted);">student@email.com</p>
+    </div>
 
-  <!-- Student basic info -->
-  <div class="card" style="margin-bottom:12px;">
-    <h3 id="studentName">Student Name</h3>
-    <p id="studentEmail" style="color:var(--muted);">student@email.com</p>
-  </div>
+    <!-- Short Motivation -->
+    <div class="card" style="margin-bottom:12px;">
+      <h3>Short Motivation</h3>
+      <p id="motivationText" style="margin-top:10px; line-height:1.8; white-space:pre-wrap;">
+        Loading...
+      </p>
+    </div>
 
-  <!-- Motivational Essay -->
-  <div class="card" style="margin-bottom:12px;">
-    <h3>Motivational Essay</h3>
-    <p id="motivationText" style="margin-top:10px; line-height:1.8;">
-      Loading...
-    </p>
-  </div>
+    <!-- Documents -->
+    <div class="grid">
+      <div class="card">
+        <h3>Student Resume</h3>
+        <div id="resumeArea" style="margin-top:10px; color:var(--muted);">Loading...</div>
+      </div>
 
-  <!-- Resume -->
-  <div class="card">
-    <h3>Student Resume</h3>
-    <p id="resumeArea" style="margin-top:10px; color:var(--muted);">
-      No resume uploaded
-    </p>
-  </div>
+      <div class="card">
+        <h3>Student Transcript</h3>
+        <div id="transcriptArea" style="margin-top:10px; color:var(--muted);">Loading...</div>
+      </div>
 
-</div>
+      <div class="card">
+        <h3>Student Portfolio</h3>
+        <div id="portfolioArea" style="margin-top:10px; color:var(--muted);">Loading...</div>
+      </div>
+    </div>
 
   </main>
 </div>
@@ -76,7 +81,6 @@
     window.location.href = "login.html";
   }
 
-  // Read application id
   const params = new URLSearchParams(window.location.search);
   const applicationId = Number(params.get("app_id"));
 
@@ -85,11 +89,71 @@
     window.location.href = "company_applicants.html";
   }
 
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  function findDoc(documents, typeTitleCase){
+    return (documents || []).find(d => String(d.doc_type) === typeTitleCase);
+  }
+
+  function renderDocBox(boxEl, doc, label){
+    if (!doc) {
+      boxEl.textContent = `No ${label.toLowerCase()} uploaded`;
+      return;
+    }
+
+    // Portfolio can be PDF or link, depending on your backend design
+    const fileUrl = doc.file_url;
+    const linkUrl = doc.portfolio_link;
+
+    const fileName = doc.file_name ? `File: ${escapeHtml(doc.file_name)}` : "";
+
+    if (linkUrl && !fileUrl) {
+      boxEl.innerHTML = `
+        <a class="btn" href="${escapeHtml(linkUrl)}" target="_blank" rel="noopener noreferrer">Open ${label}</a>
+        <span style="margin-left:10px; color:var(--muted);">${fileName}</span>
+      `;
+      return;
+    }
+
+    if (fileUrl) {
+      boxEl.innerHTML = `
+        <a class="btn" href="${escapeHtml(fileUrl)}" target="_blank" rel="noopener noreferrer">View ${label}</a>
+        <span style="margin-left:10px; color:var(--muted);">${fileName}</span>
+      `;
+      return;
+    }
+
+    boxEl.textContent = `No ${label.toLowerCase()} uploaded`;
+  }
+
+  function render(app, documents) {
+    const fullName =
+      `${app.first_name || ""} ${app.last_name || ""}`.trim() || "Student";
+    document.getElementById("studentName").textContent = fullName;
+    document.getElementById("studentEmail").textContent = app.student_email || "-";
+
+    // ✅ This will work ONLY if backend returns motivation_letter
+    document.getElementById("motivationText").textContent =
+      (app.motivation_letter && String(app.motivation_letter).trim())
+        ? app.motivation_letter
+        : "No motivation submitted";
+
+    const resume = findDoc(documents, "Resume");
+    const transcript = findDoc(documents, "Transcript");
+    const portfolio = findDoc(documents, "Portfolio");
+
+    renderDocBox(document.getElementById("resumeArea"), resume, "Resume");
+    renderDocBox(document.getElementById("transcriptArea"), transcript, "Transcript");
+    renderDocBox(document.getElementById("portfolioArea"), portfolio, "Portfolio");
+  }
+
   async function loadApplication() {
     try {
-      const res = await fetch(
-        `/api/company/${companyId}/applications/${applicationId}`
-      );
+      const res = await fetch(`/api/company/${companyId}/applications/${applicationId}`);
       const out = await res.json();
 
       if (!res.ok || !out.ok) {
@@ -104,36 +168,8 @@
     }
   }
 
-  function render(app, documents) {
-    // Student info
-    document.getElementById("studentName").textContent =
-      `${app.first_name} ${app.last_name}`;
-    document.getElementById("studentEmail").textContent =
-      app.student_email;
-
-    // Motivational essay (use description / essay field)
-    document.getElementById("motivationText").textContent =
-      app.motivation_letter || app.essay || "No essay submitted";
-
-    // Resume only
-    const resume = documents.find(d => d.doc_type === "resume");
-    const resumeArea = document.getElementById("resumeArea");
-
-    if (!resume) {
-      resumeArea.textContent = "No resume uploaded";
-    } else {
-      resumeArea.innerHTML = `
-        <a class="btn" href="${resume.file_url}" target="_blank">
-          View Resume (PDF)
-        </a>
-      `;
-    }
-  }
-
   loadApplication();
 </script>
-
-
 
 </body>
 </html>

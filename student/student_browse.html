@@ -111,7 +111,7 @@
 
         <div style="margin-top:14px;">
           <a class="btn btn-primary" href="#" onclick="goApply(${x.post_id}); return false;">Apply</a>
-          <a class="btn" href="#" onclick="goApply(${x.post_id}); return false;" style="margin-left:8px;">View</a>
+          <a class="btn" href="#" onclick="goView(${x.post_id}); return false;" style="margin-left:8px;">View</a>
         </div>
       </div>
     `;
@@ -203,6 +203,10 @@
     localStorage.setItem("selected_post_id", String(postId));
     window.location.href = "student_apply.html";
   }
+  function goView(postId){
+  localStorage.setItem("selected_post_id", String(postId));
+  window.location.href = "student_view.html";
+}
 
   // initial
   loadInternships();

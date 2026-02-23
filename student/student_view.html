@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Internship Details - CareerConnect</title>
+  <link rel="stylesheet" href="../css/style.css" />
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div>
+      <div class="brandText">CareerConnect</div>
+      <div class="pill">Student</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar" id="avatar">?</div>
+      <div>
+        <b id="studentName">Student</b>
+        <small>Student Account</small>
+      </div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="student_dashboard.html">Dashboard</a>
+      <a href="student_browse.html">Internships</a>
+      <a href="student_applications.html">Applications</a>
+      <a href="student_documents.html">Documents</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="../login.html">Switch Role</a>
+      <a href="../index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar" style="justify-content:space-between;">
+      <div>
+        <h2 style="margin:0;" id="jobTitle">Loading…</h2>
+        <p style="margin:6px 0 0; color:var(--muted);" id="jobSub">—</p>
+      </div>
+      <div class="actions">
+        <a class="btn" href="student_browse.html">Back</a>
+        <a class="btn btn-primary" href="#" onclick="applyNow(); return false;">Apply</a>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" style="grid-column: span 7;">
+        <h3>Job Description</h3>
+        <p id="jobDesc" style="margin-top:10px; line-height:1.8; white-space:pre-wrap; color:var(--muted);">—</p>
+      </div>
+
+      <div class="card" style="grid-column: span 5;">
+        <h3>Job Overview</h3>
+        <div style="margin-top:10px; line-height:1.9; color:var(--muted);">
+          <b style="color:var(--text);">Company:</b> <span id="companyName">—</span><br/>
+          <b style="color:var(--text);">Mode:</b> <span id="mode">—</span><br/>
+          <b style="color:var(--text);">Stipend:</b> <span id="stipend">—</span><br/>
+          <b style="color:var(--text);">Openings:</b> <span id="openings">—</span><br/>
+          <b style="color:var(--text);">Deadline:</b> <span id="deadline">—</span><br/>
+          <b style="color:var(--text);">Post ID:</b> <span id="postId">—</span><br/>
+          <b style="color:var(--text);">Status:</b> <span id="status">—</span>
+        </div>
+
+        <div style="margin-top:16px;">
+          <h3>Company Info</h3>
+          <div style="margin-top:10px; line-height:1.9; color:var(--muted);">
+            <b style="color:var(--text);">Industry:</b> <span id="industry">—</span><br/>
+            <b style="color:var(--text);">Phone:</b> <span id="phone">—</span><br/>
+            <b style="color:var(--text);">Website:</b> <span id="website">—</span><br/>
+            <b style="color:var(--text);">Address:</b> <span id="address">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+
+  function formatDate(v){
+    if(!v) return "-";
+    try {
+      const d = new Date(v);
+      if (isNaN(d.getTime())) return String(v);
+      return d.toLocaleDateString();
+    } catch { return String(v); }
+  }
+
+  const postId = localStorage.getItem("selected_post_id");
+  if(!postId){
+    alert("No internship selected.");
+    window.location.href = "student_browse.html";
+  }
+
+  async function loadDetail(){
+    try{
+      const r = await fetch(`/api/internships/${encodeURIComponent(postId)}`);
+      const out = await r.json();
+      if(!r.ok || !out.ok){
+        alert("Failed to load job: " + (out.error || "unknown error"));
+        window.location.href = "student_browse.html";
+        return;
+      }
+
+      const p = out.post;
+
+      document.getElementById("jobTitle").textContent = p.title || "-";
+      document.getElementById("jobSub").textContent = `${p.company_name || "-"} • ${p.work_mode || "-"}`;
+      document.getElementById("jobDesc").textContent = (p.description && String(p.description).trim()) ? p.description : "—";
+
+      document.getElementById("companyName").textContent = p.company_name || "-";
+      document.getElementById("mode").textContent = p.work_mode || "-";
+      document.getElementById("stipend").textContent = (p.stipend == null) ? "—" : (Number(p.stipend) + " THB");
+      document.getElementById("openings").textContent = p.openings ?? "-";
+      document.getElementById("deadline").textContent = formatDate(p.deadline);
+      document.getElementById("postId").textContent = p.post_id ?? "-";
+      document.getElementById("status").textContent = p.status || "-";
+
+      document.getElementById("industry").textContent = p.industry || "—";
+      document.getElementById("phone").textContent = p.phone || "—";
+      document.getElementById("website").textContent = p.website || "—";
+      document.getElementById("address").textContent = p.address || "—";
+    } catch(e){
+      alert("Cannot reach backend");
+      console.error(e);
+    }
+  }
+
+  function applyNow(){
+    // uses the same selected_post_id that your student_apply.html already reads
+    window.location.href = "student_apply.html";
+  }
+
+  loadDetail();
+</script>
+
+<script src="../js/sidebar.js"></script>
+<script>
+  const student = JSON.parse(localStorage.getItem("student"));
+  if(student){
+    document.getElementById("studentName").textContent = student.full_name || student.name || "Student";
+    document.getElementById("avatar").textContent = (student.full_name || student.name || "S")[0].toUpperCase();
+  }
+</script>
+
+</body>
+</html>

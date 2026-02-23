@@ -3,111 +3,137 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Post Internship - CareerConnect</title>
+  <title>Create Job Posting - Company</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>CareerConnect</div>
-        <div class="badge">Company • Post</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brandRow">
+      <div class="logo"></div><div class="brandText">CareerConnect</div><div class="pill">Company</div>
+    </div>
+
+    <div class="profile">
+      <div class="avatar">C</div>
+      <div><b>Company</b><small>Company Account</small></div>
+    </div>
+
+    <div class="navTitle">Menu</div>
+    <nav class="nav">
+      <a href="company_dashboard.html">Dashboard</a>
+      <a class="active" href="company_jobposts.html">Job Posts</a>
+      <a href="company_interview.html">Interview</a>
+      <a href="company_applicants.html">Applicants</a>
+    </nav>
+
+    <div class="navFooter">
+      <a href="login.html">Switch Role</a>
+      <a href="index.html">Sign Out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar" style="justify-content:space-between;">
+      <div>
+        <h2 style="margin:0;">Create Internship Posting</h2>
+        <p style="margin:6px 0 0; color:var(--muted);">This form submits to PostgreSQL.</p>
       </div>
-      <a class="btn btn-ghost" href="company_dashboard.html">Back</a>
+      <div class="actions">
+        <a class="btn" href="company_jobposts.html">Back</a>
+      </div>
     </div>
 
-    <div class="panel">
-      <h2 style="margin:0 0 6px;">Create Internship Posting</h2>
-      <p style="margin:0 0 16px; color:var(--muted);">
-        This form submits to PostgreSQL.
-      </p>
+    <div class="grid">
+      <div class="card" style="grid-column: span 12;">
+        <form id="postForm" class="form">
+          <div>
+            <div class="label">Job Title</div>
+            <input id="title" class="input" placeholder="e.g., Software Intern" required />
+          </div>
 
-      <form id="postForm" class="form">
-        <div>
-          <div class="label">Job Title</div>
-          <input id="title" class="input" placeholder="e.g., Software Intern" required />
-        </div>
+          <div>
+            <div class="label">Work Mode</div>
+            <select id="work_mode" class="input" required>
+              <option value="">Select</option>
+              <option value="Onsite">Onsite</option>
+              <option value="Hybrid">Hybrid</option>
+              <option value="Remote">Remote</option>
+            </select>
+          </div>
 
-        <div>
-          <div class="label">Work Mode</div>
-          <select id="work_mode" class="input" required>
-            <option value="">Select</option>
-            <option value="Onsite">Onsite</option>
-            <option value="Hybrid">Hybrid</option>
-            <option value="Remote">Remote</option>
-          </select>
-        </div>
+          <div>
+            <div class="label">Stipend (THB)</div>
+            <input id="stipend" type="number" class="input" placeholder="e.g., 8000" />
+          </div>
 
-        <div>
-          <div class="label">Stipend (THB)</div>
-          <input id="stipend" type="number" class="input" placeholder="e.g., 8000" />
-        </div>
+          <div>
+            <div class="label">Openings</div>
+            <input id="openings" type="number" class="input" placeholder="e.g., 2" />
+          </div>
 
-        <div>
-          <div class="label">Openings</div>
-          <input id="openings" type="number" class="input" placeholder="e.g., 2" />
-        </div>
+          <div>
+            <div class="label">Deadline</div>
+            <input id="deadline" type="date" class="input" />
+          </div>
 
-        <div>
-          <div class="label">Deadline</div>
-          <input id="deadline" type="date" class="input" />
-        </div>
+          <div>
+            <div class="label">Description</div>
+            <textarea id="description" class="textarea" placeholder="Responsibilities, requirements, etc."></textarea>
+          </div>
 
-        <div>
-          <div class="label">Description</div>
-          <textarea id="description" class="textarea" placeholder="Responsibilities, requirements, etc."></textarea>
-        </div>
-
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="btn btn-primary" type="submit">Post Job</button>
-          <a class="btn btn-ghost" href="company_dashboard.html">Cancel</a>
-        </div>
-      </form>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-primary" type="submit">Post Job</button>
+            <a class="btn btn-ghost" href="company_jobposts.html">Cancel</a>
+          </div>
+        </form>
+      </div>
     </div>
-  </div>
+  </main>
+</div>
 
-  <script>
-    const companyId = Number(localStorage.getItem("company_id"));
-    if (!companyId) {
-      alert("Not logged in as company");
-      window.location.href = "login.html";
-    }
+<script>
+  const companyId = Number(localStorage.getItem("company_id"));
+  if (!companyId) {
+    alert("Not logged in as company");
+    window.location.href = "login.html";
+  }
 
-    document.getElementById("postForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+  document.getElementById("postForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-      const data = {
-        company_id: companyId,
-        title: document.getElementById("title").value.trim(),
-        description: document.getElementById("description").value.trim(),
-        work_mode: document.getElementById("work_mode").value,
-        stipend: document.getElementById("stipend").value,
-        openings: document.getElementById("openings").value,
-        deadline: document.getElementById("deadline").value
-      };
+    const data = {
+      company_id: companyId,
+      title: document.getElementById("title").value.trim(),
+      description: document.getElementById("description").value.trim(),
+      work_mode: document.getElementById("work_mode").value,
+      stipend: document.getElementById("stipend").value,
+      openings: document.getElementById("openings").value,
+      deadline: document.getElementById("deadline").value
+    };
 
-      try {
-        const r = await fetch("/api/company/internships", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
+    try {
+      const r = await fetch("/api/company/internships", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
 
-        const out = await r.json();
+      const out = await r.json();
 
-        if (!r.ok || !out.ok) {
-          alert("❌ " + (out.error || "Failed to post"));
-          return;
-        }
-
-        alert("✅ Internship posted!");
-        window.location.href = "company_jobposts.html";
-      } catch (err) {
-        alert("❌ Server error (cannot reach backend)");
-        console.error(err);
+      if (!r.ok || !out.ok) {
+        alert("❌ " + (out.error || "Failed to post"));
+        return;
       }
-    });
-  </script>
+
+      alert("✅ Internship posted!");
+      window.location.href = "company_jobposts.html";
+    } catch (err) {
+      alert("❌ Server error (cannot reach backend)");
+      console.error(err);
+    }
+  });
+</script>
+
 </body>
 </html>

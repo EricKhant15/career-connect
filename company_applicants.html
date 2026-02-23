@@ -21,8 +21,8 @@
 
     <div class="navTitle">Menu</div>
     <nav class="nav">
+      <a href="company_dashboard.html">Dashboard</a>
       <a href="company_jobposts.html">Job Posts</a>
-      <a href="company_interview.html">Interview</a>
       <a class="active" href="company_applicants.html">Applicants</a>
     </nav>
 
@@ -49,11 +49,16 @@
         <span class="chip" id="countChip">0 applicants</span>
       </div>
     </div>
-
+    <button class="btn btn-primary" onclick="sendInterviewInvites()">
+  Invite to Interview
+</button>
     <div class="section">
       <table class="table">
-        <thead>
+          <thead>
           <tr>
+            <th style="width:40px;">
+              <input id="selectAll" type="checkbox" />
+            </th>
             <th>App ID</th>
             <th>Student Name</th>
             <th>Email</th>
@@ -62,8 +67,8 @@
             <th style="text-align:right;">Action</th>
           </tr>
         </thead>
-        <tbody id="rows">
-          <tr><td colspan="6" style="color:var(--muted);">Loading...</td></tr>
+          <tbody id="rows">
+          <tr><td colspan="7" style="color:var(--muted);">Loading...</td></tr>
         </tbody>
       </table>
     </div>
@@ -100,14 +105,14 @@
       const out = await r.json();
       if (!r.ok || !out.ok) {
         document.getElementById("rows").innerHTML =
-          `<tr><td colspan="6" style="color:var(--muted);">Failed to load: ${escapeHtml(out.error || "unknown error")}</td></tr>`;
+          `<tr><td colspan="7" style="color:var(--muted);">Failed to load: ${escapeHtml(out.error || "unknown error")}</td></tr>`;
         return;
       }
       applicants = out.applicants || [];
       render();
     } catch (e) {
       document.getElementById("rows").innerHTML =
-        `<tr><td colspan="6" style="color:var(--muted);">Cannot reach backend</td></tr>`;
+        `<tr><td colspan="7" style="color:var(--muted);">Cannot reach backend</td></tr>`;
       console.error(e);
     }
   }
@@ -133,7 +138,7 @@
 
     const body = document.getElementById("rows");
     if (!list.length) {
-      body.innerHTML = `<tr><td colspan="6" style="color:var(--muted);">No applicants yet.</td></tr>`;
+      body.innerHTML = `<tr><td colspan="7" style="color:var(--muted);">No applicants yet.</td></tr>`;
       return;
     }
 
@@ -145,25 +150,37 @@
       const viewHref = `company_application.html?app_id=${encodeURIComponent(a.application_id)}`;
 
       return `
-        <tr>
-          <td>#${escapeHtml(a.application_id)}</td>
-          <td>${escapeHtml(name)}</td>
-          <td>${escapeHtml(a.student_email || "-")}</td>
-          <td>${escapeHtml(a.post_title || "-")}</td>
-          <td>
-            <span class="status ${statusClass(status)}">${escapeHtml(status)}</span>
-          </td>
-          <td style="text-align:right;">
-            <div style="display:flex; justify-content:flex-end; gap:10px; align-items:center; flex-wrap:wrap;">
-              <a class="btn" href="${viewHref}">View</a>
+              <tr>
+                <td style="width:40px;">
+                  <input class="appSelect" type="checkbox" value="${escapeHtml(a.application_id)}" />
+                </td>
 
-              <select onchange="updateStatus(${a.application_id}, this.value)" class="input" style="max-width:190px;">
-                ${renderStatusOptions(status)}
-              </select>
-            </div>
-          </td>
-        </tr>
-      `;
+                <td>#${escapeHtml(a.application_id)}</td>
+
+                <td class="truncate">${escapeHtml(name)}</td>
+
+                <td class="truncate">${escapeHtml(a.student_email || "-")}</td>
+
+                <td class="truncate">${escapeHtml(a.post_title || "-")}</td>
+
+                <td>
+                  <span class="status ${statusClass(status)}">${escapeHtml(status)}</span>
+                </td>
+
+                <td style="text-align:right;">
+                  <div style="display:flex; gap:8px; align-items:center;">
+                    <a class="btn btn-sm" href="${viewHref}">View</a>
+
+                    <select
+                      class="input input-sm"
+                      onchange="updateStatus(${a.application_id}, this.value)"
+                    >
+                      ${renderStatusOptions(status)}
+                    </select>
+                  </div>
+                </td>
+              </tr>
+          `;
     }).join("");
   }
 
@@ -201,8 +218,73 @@
   }
 
   document.getElementById("q").addEventListener("input", render);
-
+  document.getElementById("selectAll").addEventListener("change", (e) => {
+  const checked = e.target.checked;
+  document.querySelectorAll(".appSelect").forEach(cb => cb.checked = checked);
+});
   loadApplicants();
+
+
+  function getCompanyId() {
+  return Number(localStorage.getItem("company_id"));
+}
+
+function getSelectedApplicationIds() {
+  return Array.from(document.querySelectorAll(".appSelect:checked"))
+    .map(cb => Number(cb.value))
+    .filter(Boolean);
+}
+
+async function sendInterviewInvites() {
+  const companyId = getCompanyId();
+  if (!companyId) {
+    alert("Please log in as a company first.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  const ids = getSelectedApplicationIds();
+  if (ids.length === 0) {
+    alert("Please select at least 1 student/application.");
+    return;
+  }
+
+  // Simple prompts (fast)
+  const scheduledAt = prompt("Enter interview date/time (YYYY-MM-DD HH:MM) or ISO:");
+  if (!scheduledAt) return;
+
+  const interviewType = prompt("Interview type (Online / Onsite / Phone) (optional):") || "";
+  const locationOrLink = prompt("Location or meeting link (optional):") || "";
+
+  try {
+    const r = await fetch(`/api/company/${companyId}/interviews/bulk`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        application_ids: ids,
+        scheduled_at: scheduledAt,
+        interview_type: interviewType,
+        location_or_link: locationOrLink
+      })
+    });
+
+    const out = await r.json();
+
+    if (!r.ok || !out.ok) {
+      alert("❌ " + (out.error || "Failed to send invites"));
+      console.error(out);
+      return;
+    }
+
+    alert(`✅ Interview invites sent to ${out.invited_count} application(s)!`);
+    // optionally refresh page data:
+    // await loadApplicants();
+    // or window.location.reload();
+  } catch (e) {
+    console.error(e);
+    alert("❌ Cannot reach backend");
+  }
+}
 </script>
 
 </body>

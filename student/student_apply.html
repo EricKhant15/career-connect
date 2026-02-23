@@ -22,9 +22,9 @@
     </div>
 
     <div class="profile">
-      <div class="avatar">E</div>
+      <div class="avatar" id="avatar">S</div>
       <div>
-        <b>Student</b>
+        <b id="studentName">Student</b>
         <small>Student Account</small>
       </div>
     </div>
@@ -48,9 +48,7 @@
   </aside>
 
   <main class="main">
-
     <div class="section" style="max-width: 980px;">
-      
       <form id="applyForm">
         <div class="grid" style="margin-top:12px;">
           <div class="card" style="grid-column: span 6;">
@@ -79,29 +77,42 @@
 </div>
 
 <script>
+  // ✅ show student name from localStorage (if exists)
+  const studentObj = JSON.parse(localStorage.getItem("student") || "null");
+  if (studentObj) {
+    const name = studentObj.full_name || studentObj.name || "Student";
+    document.getElementById("studentName").textContent = name;
+    document.getElementById("avatar").textContent = name[0].toUpperCase();
+  }
+
   const studentId = Number(localStorage.getItem("student_id"));
   if (!studentId) {
     alert("Not logged in as student");
     window.location.href = "../login.html";
   }
 
-  const selectedPostId = localStorage.getItem("selected_post_id");
+  // ✅ Support both: student_apply.html?post_id=7  AND  localStorage.selected_post_id
+  const params = new URLSearchParams(window.location.search);
+  const postIdFromUrl = Number(params.get("post_id"));
 
-  function escapeHtml(s){
-    return String(s ?? "")
-      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  if (postIdFromUrl) {
+    localStorage.setItem("selected_post_id", String(postIdFromUrl));
+  }
+
+  function getSelectedPostId() {
+    const v = localStorage.getItem("selected_post_id");
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : 0;
   }
 
   document.getElementById("applyForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const postId = Number(selectedPostId);
+    const postId = getSelectedPostId();
     if (!postId) {
       alert("No internship selected");
-    return;
-}
-
+      return;
+    }
 
     const motivation = document.getElementById("motivation").value.trim();
 
@@ -116,7 +127,7 @@
         })
       });
 
-      const out = await r.json();
+      const out = await r.json().catch(() => ({}));
 
       if (!r.ok || !out.ok) {
         alert("❌ " + (out.error || "Failed to apply"));

@@ -28,10 +28,7 @@
       <div class="navTitle">Menu</div>
       <nav class="nav">
         <a class="active" href="student_dashboard.html">Dashboard</a>
-
         <a href="student_browse.html">Internships</a>
-      
-
         <a href="student_applications.html">Applications</a>
         <a href="student_documents.html">Documents</a>
       </nav>
@@ -49,42 +46,29 @@
           <span style="color:var(--muted);font-weight:800;">🔎</span>
           <input placeholder="Search internships, companies, skills..." />
         </div>
-        <div class="actions">
+
+        <!-- ✅ Added: Greeting + DB status pill -->
+        <div class="actions" style="display:flex; align-items:center; gap:10px;">
+          <div id="helloTitle" style="font-weight:800;">Hello, Student</div>
+          <span id="modePill" class="status warn">Loading…</span>
         </div>
       </div>
 
-      <div class="card" style="grid-column: span 12;">
-        <div class="cardTitle">
-          <div>
-            <h2 id="helloTitle">Hello</h2>
-            <p>Here are your latest internship updates.</p>
-          </div>
-          <span class="status ok" id="modePill">Connected to DB</span>
+      <!-- ✅ KPI (3 only) -->
+      <div class="metric">
+        <div class="kpi">
+          <b id="kpiSubmitted">0</b>
+          <small>Applications Submitted</small>
         </div>
 
-        <!-- ✅ KPI (3 only) -->
-        <div class="metric">
-          <div class="kpi"><b id="kpiSubmitted">0</b><small>Applications Submitted</small></div>
-          <div class="kpi"><b id="kpiOffers">0</b><small>Offers (Offered + Accepted)</small></div>
-          <div class="kpi"><b id="kpiRejected">0</b><small>Rejections</small></div>
-        </div>
-      </div>
-
-      <div class="grid" style="margin-top:14px;">
-        <div class="card">
-          <h3>Browse Internships</h3>
-          <p>Find internships by location, mode, and category.</p>
-          <div style="margin-top:12px;">
-            <a class="btn btn-primary" href="student_browse.html">Open</a>
-          </div>
+        <div class="kpi">
+          <b id="kpiOffers">0</b>
+          <small>Offers (Offered + Accepted)</small>
         </div>
 
-        <div class="card">
-          <h3>Manage Documents</h3>
-          <p>Upload resume, transcript, and other documents.</p>
-          <div style="margin-top:12px;">
-            <a class="btn" href="student_documents.html">Open</a>
-          </div>
+        <div class="kpi">
+          <b id="kpiRejected">0</b>
+          <small>Rejections</small>
         </div>
       </div>
     </main>
@@ -99,39 +83,48 @@
     window.location.href = "../login.html";
   }
 
-  document.getElementById("studentLabel").textContent = studentName;
-  document.getElementById("avatarLetter").textContent = (studentName || "S").trim().charAt(0).toUpperCase();
-  document.getElementById("helloTitle").textContent = "Hello, " + studentName;
+  // safe set text (avoid crashing if element missing)
+  function setText(id, text) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+  function setPill(status, text) {
+    const el = document.getElementById("modePill");
+    if (!el) return;
+    el.className = "status " + status; // ok | warn
+    el.textContent = text;
+  }
 
-  async function loadStats(){
+  setText("studentLabel", studentName);
+  setText("avatarLetter", (studentName || "S").trim().charAt(0).toUpperCase());
+  setText("helloTitle", "Hello, " + studentName);
+
+  async function loadStats() {
     try {
-      const r = await fetch(`http://localhost:5050/api/student/${studentId}/dashboard`);
+      // ✅ Use relative URL (works on localhost + deployments)
+      const r = await fetch(`/api/student/${studentId}/dashboard`);
       const out = await r.json();
 
       if (!r.ok || !out.ok) {
-        document.getElementById("modePill").className = "status warn";
-        document.getElementById("modePill").textContent = "DB Error";
-        console.error(out);
+        setPill("warn", "DB Error");
+        console.error("Dashboard API error:", out);
         return;
       }
 
       const s = out.stats || {};
-      document.getElementById("kpiSubmitted").textContent = s.submitted ?? 0;
-      document.getElementById("kpiOffers").textContent = s.offers ?? 0;
-      document.getElementById("kpiRejected").textContent = s.rejected ?? 0;
+      setText("kpiSubmitted", s.submitted ?? 0);
+      setText("kpiOffers", s.offers ?? 0);
+      setText("kpiRejected", s.rejected ?? 0);
 
-      document.getElementById("modePill").className = "status ok";
-      document.getElementById("modePill").textContent = "Connected to DB";
-
+      setPill("ok", "Connected to DB");
     } catch (e) {
-      document.getElementById("modePill").className = "status warn";
-      document.getElementById("modePill").textContent = "Cannot reach backend";
+      setPill("warn", "Cannot reach backend");
       console.error(e);
     }
   }
 
   loadStats();
 </script>
-
+  
 </body>
 </html>

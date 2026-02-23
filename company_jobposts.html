@@ -23,7 +23,6 @@
     <nav class="nav">
       <a href="company_dashboard.html">Dashboard</a>
       <a class="active" href="company_jobposts.html">Job Posts</a>
-      <a href="company_interview.html">Interview</a>
       <a href="company_applicants.html">Applicants</a>
     </nav>
 
@@ -45,8 +44,6 @@
       </div>
     </div>
 
-    
-
     <div class="grid">
       <!-- LEFT: Job list -->
       <div class="card" style="grid-column: span 4;">
@@ -67,13 +64,11 @@
             <div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
               <span class="chip" id="metaPosted">Posted: —</span>
               <span class="chip" id="metaDeadline">Deadline: —</span>
-              <span class="chip" id="metaApplicants">Applicants: —</span>
             </div>
           </div>
 
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
             <span class="status good" id="jobStatusPill">—</span>
-            <a class="btn" href="company_post.html">Create New</a>
           </div>
         </div>
 
@@ -90,7 +85,7 @@
 
           <div class="card" style="grid-column: span 12;">
             <h3>Job Description</h3>
-            <p id="jobDesc" style="margin-top:8px; line-height:1.8;"></p>
+            <p id="jobDesc" style="margin-top:8px; line-height:1.8; white-space:pre-wrap;"></p>
           </div>
         </div>
       </div>
@@ -106,7 +101,7 @@
   }
 
   let jobs = [];
-  let selected = 0;
+  let selectedPostId = null;
 
   function statusClass(status){
     return (status === "Active") ? "good" : "warn";
@@ -123,7 +118,7 @@
       }
 
       jobs = out.posts || [];
-      selected = 0;
+      selectedPostId = jobs[0]?.post_id ?? null;
       renderAll();
     } catch (e) {
       alert("❌ Cannot reach backend");
@@ -137,6 +132,11 @@
     return jobs.filter(j => (String(j.title || "").toLowerCase().includes(q)));
   }
 
+  function getSelectedJob(){
+    if (!jobs.length) return null;
+    return jobs.find(j => j.post_id === selectedPostId) || jobs[0] || null;
+  }
+
   function renderJobList(list){
     const el = document.getElementById("jobList");
 
@@ -145,10 +145,10 @@
       return;
     }
 
-    el.innerHTML = list.map((j, idx) => {
-      const isActive = (idx === selected);
+    el.innerHTML = list.map((j) => {
+      const isActive = (j.post_id === selectedPostId);
       return `
-        <div onclick="selectIndex(${idx})"
+        <div onclick="selectPost(${j.post_id})"
              style="padding:12px; border:1px solid var(--border); border-radius:16px;
                     background:${isActive ? "rgba(99,102,241,.12)" : "rgba(255,255,255,.04)"}; cursor:pointer;">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
@@ -167,8 +167,6 @@
     if (!j) return;
 
     document.getElementById("jobTitle").textContent = j.title || "-";
-    document.getElementById("jobSubtitle").textContent = `${j.work_mode || "-"} • ${Number(j.stipend || 0)} THB`;
-
     const pill = document.getElementById("jobStatusPill");
     pill.className = "status " + statusClass(j.status);
     pill.textContent = j.status || "-";
@@ -176,16 +174,17 @@
     document.getElementById("metaId").textContent = j.post_id ?? "-";
     document.getElementById("metaPosted").textContent = "Posted: " + (j.posted_date || "-");
     document.getElementById("metaDeadline").textContent = "Deadline: " + (j.deadline || "-");
-    document.getElementById("metaApplicants").textContent = "Applicants: —"; // later when you implement applications
     document.getElementById("metaMode").textContent = j.work_mode || "-";
     document.getElementById("metaAllowance").textContent = (j.stipend ?? 0) + " THB";
     document.getElementById("metaOpenings").textContent = j.openings ?? "-";
 
-    document.getElementById("jobDesc").textContent = j.description || "-";
+    // ✅ this will work once backend returns description
+    document.getElementById("jobDesc").textContent =
+      (j.description && String(j.description).trim()) ? j.description : "—";
   }
 
-  function selectIndex(i){
-    selected = i;
+  function selectPost(postId){
+    selectedPostId = postId;
     renderAll();
   }
 
@@ -196,8 +195,13 @@
     document.getElementById("openCount").textContent =
       "Open: " + jobs.filter(x => x.status === "Active").length;
 
+    // If search filtered out selected job, pick first visible
+    if (list.length && !list.some(x => x.post_id === selectedPostId)) {
+      selectedPostId = list[0].post_id;
+    }
+
     renderJobList(list);
-    renderDetails(jobs[selected]);
+    renderDetails(getSelectedJob());
   }
 
   function escapeHtml(s) {
